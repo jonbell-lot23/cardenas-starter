@@ -2,7 +2,7 @@
 
 A personal activity tracker for conversational logging. Witness the vastness of what you've actually accomplished.
 
-**[Get started →](https://cardenas.vercel.app)**
+**[Get started →](https://cardenas-starter.vercel.app)**
 
 ## License
 
