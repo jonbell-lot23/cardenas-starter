@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cárdenas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #faf9f7;
+            color: #1a1612;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            color: #1a1612;
+        }
+
+        .hero .tagline {
+            font-size: 1.25rem;
+            color: #8b7355;
+            font-weight: 400;
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8b7355;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #1a1612;
+        }
+
+        blockquote {
+            border-left: 3px solid #c9a07a;
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: #5a4a3a;
+            font-style: italic;
+        }
+
+        /* Features list */
+        .features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .features li::before {
+            content: "—";
+            position: absolute;
+            left: 0;
+            color: #c9a07a;
+        }
+
+        /* Prompt section */
+        .prompt-section {
+            background: #fff;
+            border: 1px solid #e8e4df;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .prompt-section h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .prompt-intro {
+            color: #8b7355;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .prompt-box {
+            position: relative;
+        }
+
+        .prompt-code {
+            background: #f5f3f0;
+            border: 1px solid #e8e4df;
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #1a1612;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: #c9a07a;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background: #b8926c;
+        }
+
+        .copy-button.copied {
+            background: #2d8a4e;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e8e4df;
+            text-align: center;
+            color: #b8a990;
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: #8b7355;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <h1>Cárdenas</h1>
+            <p class="tagline">Witness the vastness of what you've actually accomplished</p>
+        </header>
+
+        <section>
+            <h2>The Name</h2>
+            <p>
+                Named after García López de Cárdenas, the first European to see the Grand Canyon in 1540.
+                He saw the scale but couldn't comprehend it fully—which perfectly captures the feeling of
+                looking at your own activity data.
+            </p>
+            <blockquote>
+                Like Cárdenas standing at the rim, the system helps you witness the vastness of what
+                you've actually accomplished, even when you can't fully grasp it in the moment.
+            </blockquote>
+        </section>
+
+        <section>
+            <h2>What It Does</h2>
+            <p>
+                Cárdenas follows the principle of <strong>conversational simplicity</strong>: just talk
+                about what you're doing throughout the day, and the system captures everything in a
+                queryable format.
+            </p>
+            <ul class="features">
+                <li>Zero-friction logging to daily JSON files</li>
+                <li>Intelligent querying by date range</li>
+                <li>Goals with horizons (life → yearly → quarterly → monthly → weekly)</li>
+                <li>Health and mood tracking</li>
+                <li>Local-first, no external dependencies</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Philosophy</h2>
+            <p>
+                Capture <strong>depth</strong>, not just summaries. Good entries include mental state,
+                strategic insights, and the "why" behind decisions.
+            </p>
+            <blockquote>
+                BAD: "Wrote document"<br>
+                GOOD: "Mental state: Using work momentum as self-soothing—creating control when system feels chaotic"
+            </blockquote>
+        </section>
+
+        <div class="prompt-section">
+            <h2>Get Started</h2>
+            <p class="prompt-intro">
+                Copy this prompt and paste it into <a href="https://claude.ai/code" target="_blank">Claude Code</a>.
+                It will set up the complete system for you.
+            </p>
+            <div class="prompt-box">
+                <button class="copy-button" onclick="copyPrompt()">Copy</button>
+                <pre class="prompt-code">Set up Cárdenas, a personal activity tracker for conversational logging.
+
+Create these scripts:
+1. `track` - logs timestamped entries to `activity/raw/daily/YYYY-MM-DD.json`
+2. `scripts/read-activity` - queries activities by --today, --week, --days N, --since, --range
+3. `scripts/goals` - manage goals with horizons: life, yearly, quarterly, monthly, weekly
+4. `scripts/goal-reflect` - log progress against goals
+5. `scripts/health-log` - log mood (stress, energy) and symptoms
+
+Directory structure:
+- activity/raw/daily/ (JSON files)
+- activity/summaries/daily/ (narrative summaries)
+- goals/active.json, goals/reflections/
+- health/daily/
+
+Philosophy: Capture DEPTH, not just summaries. Good entries include:
+- Mental state and emotional context
+- Strategic insights and breakthroughs
+- Why certain approaches are being chosen
+- Direct quotes capturing key thinking
+
+Example: BAD: "Wrote document" → GOOD: "Mental state: Using work momentum as self-soothing - creating control when system feels chaotic"
+
+Data format: JSON arrays with {time, activity} objects.
+
+Make it local-first, no external dependencies. Just fast local files.</pre>
+            </div>
+        </div>
+
+        <footer>
+            <p>
+                <a href="https://github.com/jonbell-lot23/cardenas">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function copyPrompt() {
+            const prompt = document.querySelector('.prompt-code').textContent;
+            navigator.clipboard.writeText(prompt).then(() => {
+                const button = document.querySelector('.copy-button');
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
