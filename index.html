@@ -6,8 +6,8 @@
     <title>Cárdenas</title>
     <style>
       @font-face {
-        font-family: 'Departure Mono';
-        src: url('DepartureMono-Regular.woff2') format('woff2');
+        font-family: "Departure Mono";
+        src: url("DepartureMono-Regular.woff2") format("woff2");
         font-weight: normal;
         font-style: normal;
       }
@@ -19,7 +19,7 @@
       }
 
       body {
-        font-family: 'Departure Mono', monospace;
+        font-family: "Departure Mono", monospace;
         background-color: #1e3a8a;
         color: #fff;
         line-height: 1.7;
@@ -38,7 +38,6 @@
         font-size: 10px;
         line-height: 1.1;
         margin-bottom: 0.5rem;
-        opacity: 0.9;
       }
 
       .tagline {
@@ -52,8 +51,6 @@
 
       .examples {
         margin: 1.5rem 0;
-        font-size: 0.9rem;
-        opacity: 0.9;
         white-space: pre;
       }
 
@@ -64,32 +61,25 @@
       .install-box {
         margin: 1rem 0;
         cursor: pointer;
-        font-size: 0.8rem;
-        opacity: 0.9;
-        transition: opacity 0.2s;
+        transition: background 0.2s;
       }
 
       .install-box:hover {
-        opacity: 1;
+        background: rgba(255, 255, 255, 0.1);
       }
 
       .more-link {
-        font-size: 0.85rem;
-        opacity: 0.7;
+        margin-bottom: 1rem;
       }
 
       .footer {
         margin-top: 3rem;
         padding-top: 1.5rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-        opacity: 0.7;
-        font-size: 0.85rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
       }
 
       .name-explanation {
         margin-top: 2rem;
-        opacity: 0.8;
-        font-size: 0.9rem;
       }
     </style>
   </head>
@@ -117,11 +107,16 @@
 +------------------------------------------------------------------------+
       </pre>
       <p class="more-link">
-        You should really <a href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh">look at the script</a> before you trust a rando on the internet.
-        <br><a href="#what-it-does">Read more about what the script does</a>
+        You should really
+        <a
+          href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh"
+          >look at the script</a
+        >
+        before you trust a rando on the internet.
+        <a href="#what-it-does">Read more about what the script does.</a>
       </p>
 
-      <p style="margin-top: 2rem;">
+      <p style="margin-top: 2rem">
         <b>Step one:</b> tell Claude what you're working on, how you're feeling,
         or what you need to remember:
       </p>
@@ -141,7 +136,8 @@
       </p>
 
       <p>
-        <b>Step two:</b> The system gets more valuable over time, so you can ask bigger questions:
+        <b>Step two:</b> The system gets more valuable over time, so you can ask
+        bigger questions:
       </p>
 
       <pre class="examples">
@@ -154,18 +150,32 @@
 
       <p>
         <b>Step three:</b>
-        As you get more data, it's easy to wire it up to other things. In my setup, I have it connected to my OmniFocus, Google Calendar, Granola, and my writing projects.
+        As you get more data, it's easy to wire it up to other things. In my
+        setup, I have it connected to my OmniFocus, Google Calendar, Granola,
+        and my writing projects.
       </p>
       <p>
-        But what really lights things up is getting started with simple daily reflections. Just a few sentences each day can help you see patterns over time.
+        But what really lights things up is getting started with simple daily
+        reflections. Just a few sentences each day can help you see patterns
+        over time.
       </p>
 
       <div id="what-it-does" class="name-explanation">
-        <b>What the script does:</b> It creates a ~/cmd/cardenas folder with bash scripts for tracking activities, querying your history, and managing goals. It also sets up Claude Code skills (/track, /today, /week) so you can use slash commands. Everything stays local—just text files on your machine.
+        <b>What the script does:</b> It creates a ~/cmd/cardenas folder with
+        bash scripts for tracking activities, querying your history, and
+        managing goals. It also sets up Claude Code skills (/track, /today,
+        /week) so you can use slash commands. Everything stays local—just text
+        files on your machine.
       </div>
 
       <div class="name-explanation">
-        <b>The name:</b> Named after García López de Cárdenas, the first European to see the Grand Canyon in 1540. He stood at the rim of something vast and couldn't fully comprehend what he was looking at. That's the feeling this tool is built around—not "look at all your data" but discovery. Each day you add a little more, and over time you start to see patterns you couldn't see before. It's about exploring what's already there.
+        <b>The name:</b> Named after García López de Cárdenas, the first
+        European to see the Grand Canyon in 1540. He stood at the rim of
+        something vast and couldn't fully comprehend what he was looking at.
+        That's the feeling this tool is built around—not "look at all your data"
+        but discovery. Each day you add a little more, and over time you start
+        to see patterns you couldn't see before. It's about exploring what's
+        already there.
       </div>
 
       <p class="footer">
@@ -175,11 +185,15 @@
 
     <script>
       function copyInstall() {
-        const cmd = 'curl -fsSL https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/install.sh | bash';
+        const cmd =
+          "curl -fsSL https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/install.sh | bash";
         navigator.clipboard.writeText(cmd).then(() => {
-          const box = document.querySelector('.install-box');
+          const box = document.querySelector(".install-box");
           const original = box.textContent;
-          box.textContent = box.textContent.replace('[click to copy]', '[copied!]      ');
+          box.textContent = box.textContent.replace(
+            "[click to copy]",
+            "[copied!]      "
+          );
           setTimeout(() => {
             box.textContent = original;
           }, 2000);
