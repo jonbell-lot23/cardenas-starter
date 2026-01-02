@@ -1,10 +1,10 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════════════════
-# Cárdenas Installer v0.1.2
+# Cárdenas Installer v0.1.3
 # A personal activity tracker for Claude Code
 # ═══════════════════════════════════════════════════════════════════════════
 
-VERSION="0.1.2"
+VERSION="0.1.3"
 
 echo ""
 echo "Cárdenas - activity tracker for Claude Code"
@@ -20,7 +20,7 @@ echo "Creating: $DIR"
 mkdir -p "$DIR/activity/raw/daily"
 mkdir -p "$HOME/.claude/commands"
 
-# Create the track script
+# Create the track script (cross-platform: macOS, Linux, Windows/WSL/Git Bash)
 cat > "$DIR/track" << 'TRACKSCRIPT'
 #!/bin/bash
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -28,11 +28,24 @@ FILE="$DIR/activity/raw/daily/$(date +%Y-%m-%d).json"
 [[ ! -f "$FILE" ]] && echo "[]" > "$FILE"
 MSG="$*"
 [[ -z "$MSG" ]] && { echo "Usage: track \"message\""; exit 1; }
-ENTRY="{\"time\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"activity\":\"$(echo "$MSG" | sed 's/"/\\"/g')\"}"
+
+# Escape quotes and backslashes for JSON
+MSG_ESCAPED=$(printf '%s' "$MSG" | sed 's/\\/\\\\/g; s/"/\\"/g')
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+ENTRY="{\"time\":\"$TIMESTAMP\",\"activity\":\"$MSG_ESCAPED\"}"
+
 if command -v jq &>/dev/null; then
   jq ". += [$ENTRY]" "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
 else
-  [[ "$(cat "$FILE")" == "[]" ]] && echo "[$ENTRY]" > "$FILE" || { sed -i '' 's/]$//' "$FILE"; echo ",$ENTRY]" >> "$FILE"; }
+  # Fallback without jq (works on macOS, Linux, Windows/Git Bash)
+  CONTENT=$(cat "$FILE")
+  if [[ "$CONTENT" == "[]" ]]; then
+    echo "[$ENTRY]" > "$FILE"
+  else
+    # Remove trailing ] and newlines, append new entry
+    printf '%s' "${CONTENT%]}" > "$FILE"
+    printf ',%s]' "$ENTRY" >> "$FILE"
+  fi
 fi
 echo "✓ $MSG"
 TRACKSCRIPT
