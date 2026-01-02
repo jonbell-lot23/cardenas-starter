@@ -80,6 +80,31 @@
       .name-explanation {
         margin-top: 2rem;
       }
+
+      .shooting-star {
+        position: fixed;
+        font-family: "Courier New", monospace;
+        color: #7dd3fc;
+        font-size: 14px;
+        pointer-events: none;
+        opacity: 0;
+        white-space: nowrap;
+      }
+
+      @keyframes shoot {
+        0% {
+          opacity: 1;
+          transform: translate(0, 0);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(200px, 150px);
+        }
+      }
+
+      .shooting-star.animate {
+        animation: shoot 0.8s ease-out forwards;
+      }
     </style>
   </head>
   <body>
@@ -172,7 +197,24 @@
 
     </div>
 
+    <div class="shooting-star" id="star">*===</div>
+
     <script>
+      function launchStar() {
+        const star = document.getElementById('star');
+        const box = document.querySelector('.install-box');
+        const rect = box.getBoundingClientRect();
+
+        // Start from right side of the install box
+        star.style.top = (rect.top + 20) + 'px';
+        star.style.left = (rect.right - 50) + 'px';
+
+        // Remove and re-add class to restart animation
+        star.classList.remove('animate');
+        void star.offsetWidth; // Force reflow
+        star.classList.add('animate');
+      }
+
       function copyInstall() {
         const cmd = `Hi Claude, I'm thinking of installing this script. Can you confirm it's safe? If so, let's walk through the setup.
 
@@ -184,6 +226,7 @@ https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh`;
             "[click to copy]",
             "[copied!]      "
           );
+          launchStar();
           setTimeout(() => {
             box.textContent = original;
           }, 2000);
