@@ -12,247 +12,120 @@
         }
 
         body {
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', 'Source Code Pro', monospace;
-            background-color: #1a1612;
-            color: #e8e4df;
-            line-height: 1.6;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', monospace;
+            background-color: #0abab5;
+            color: #fff;
+            line-height: 1.7;
             min-height: 100vh;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .container {
-            max-width: 72ch;
+            max-width: 60ch;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 3rem 1.5rem;
         }
 
-        pre {
-            white-space: pre;
-            overflow-x: auto;
-        }
-
-        .ascii-art {
-            color: #c9a07a;
-            margin-bottom: 1rem;
-            font-size: 12px;
-            line-height: 1.2;
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
         }
 
         .tagline {
-            color: #8b7355;
-            margin-bottom: 3rem;
-        }
-
-        .section {
+            opacity: 0.8;
             margin-bottom: 2.5rem;
         }
 
-        .section-header {
-            color: #c9a07a;
+        p {
             margin-bottom: 1rem;
         }
 
-        p, .content {
-            color: #b8a990;
-            margin-bottom: 1rem;
+        .examples {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
         }
 
-        .highlight {
-            color: #e8e4df;
+        .example {
+            opacity: 0.9;
         }
 
-        .dim {
-            color: #6b5b4a;
+        .install {
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.3);
         }
 
         a {
-            color: #c9a07a;
-            text-decoration: none;
+            color: #fff;
         }
 
-        a:hover {
-            text-decoration: underline;
+        code {
+            background: rgba(255,255,255,0.15);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9em;
         }
 
         .code-block {
-            background: #0d0b09;
-            border: 1px solid #3a3228;
+            background: rgba(0,0,0,0.2);
             padding: 1rem;
             margin: 1rem 0;
+            border-radius: 4px;
             overflow-x: auto;
         }
 
-        .code-block code {
-            color: #b8a990;
-        }
-
-        .command {
-            color: #c9a07a;
-        }
-
-        .comment {
-            color: #6b5b4a;
-        }
-
-        .install-box {
-            border: 1px solid #c9a07a;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .install-box .header {
-            color: #c9a07a;
-            margin-bottom: 1rem;
-        }
-
-        .warning {
-            color: #b8860b;
-        }
-
-        .list-item {
-            padding-left: 2ch;
-        }
-
-        .list-item::before {
-            content: "- ";
-            color: #6b5b4a;
-        }
-
-        .numbered-item {
-            padding-left: 3ch;
-        }
-
         .footer {
-            margin-top: 4rem;
-            padding-top: 1rem;
-            border-top: 1px solid #3a3228;
-            color: #6b5b4a;
-        }
-
-        .footer a {
-            color: #8b7355;
-        }
-
-        @media (max-width: 600px) {
-            body {
-                font-size: 12px;
-            }
-            .ascii-art {
-                font-size: 8px;
-            }
+            margin-top: 2.5rem;
+            opacity: 0.6;
+            font-size: 0.85rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <pre class="ascii-art">
- ██████╗ █████╗ ██████╗ ██████╗ ███████╗███╗   ██╗ █████╗ ███████╗
-██╔════╝██╔══██╗██╔══██╗██╔══██╗██╔════╝████╗  ██║██╔══██╗██╔════╝
-██║     ███████║██████╔╝██║  ██║█████╗  ██╔██╗ ██║███████║███████╗
-██║     ██╔══██║██╔══██╗██║  ██║██╔══╝  ██║╚██╗██║██╔══██║╚════██║
-╚██████╗██║  ██║██║  ██║██████╔╝███████╗██║ ╚████║██║  ██║███████║
- ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
-        </pre>
-        <p class="tagline">witness the vastness of what you've actually accomplished</p>
+        <h1>Cárdenas</h1>
+        <p class="tagline">a personal activity tracker for Claude Code</p>
 
-        <div class="section">
-            <p class="section-header">═══ WHAT IT IS ═══</p>
-            <p>
-                A personal activity tracker for <span class="highlight">conversational logging</span>.
-            </p>
-            <p>
-                Named after García López de Cárdenas, the first European to see
-                the Grand Canyon in 1540. He saw the scale but couldn't comprehend
-                it fully—which perfectly captures the feeling of looking at your
-                own activity data.
-            </p>
-            <p class="dim">
-                Like Cárdenas standing at the rim, the system helps you witness
-                the vastness of what you've actually accomplished, even when you
-                can't fully grasp it in the moment.
-            </p>
+        <p>
+            Track what you're doing throughout the day:
+        </p>
+
+        <div class="examples">
+            <p class="example">"started working on the API refactor"</p>
+            <p class="example">"feeling scattered, need to focus"</p>
+            <p class="example">"remind me to follow up with Sarah"</p>
+            <p class="example">"breakthrough on the auth flow"</p>
         </div>
 
-        <div class="section">
-            <p class="section-header">═══ WHAT IT DOES ═══</p>
-            <div class="content">
-                <p class="list-item">Zero-friction logging to daily JSON files</p>
-                <p class="list-item">Query activities by date range (--today, --week, --days N)</p>
-                <p class="list-item">Goals with horizons: life → yearly → quarterly → monthly → weekly</p>
-                <p class="list-item">Mood and health tracking</p>
-                <p class="list-item">Claude Code skills (/track, /today, /week, /goals)</p>
-                <p class="list-item">Local-first. No external dependencies. Just files.</p>
-            </div>
-        </div>
+        <p>
+            It's part coach, part todo list, part guardrails on your focus.
+            Everything stays local as simple JSON files.
+        </p>
 
-        <div class="section">
-            <p class="section-header">═══ PHILOSOPHY ═══</p>
+        <p>
+            Over time, you can ask bigger questions: <em>what am I avoiding?</em>
+            <em>where do I lose momentum?</em> <em>what was I thinking last Tuesday?</em>
+        </p>
+
+        <div class="install">
             <p>
-                Capture <span class="highlight">depth</span>, not just summaries.
+                <strong>Install:</strong>
+                <a href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh">review the script</a>, then:
             </p>
             <div class="code-block">
-                <code>
-<span class="comment"># BAD</span>
-"Wrote document"
-
-<span class="comment"># GOOD</span>
-"Mental state: Using work momentum as self-soothing—
- creating control when system feels chaotic"
-                </code>
+curl -O https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/install.sh
+chmod +x install.sh && ./install.sh
             </div>
-            <p class="dim">
-                Good entries include mental state, strategic insights,
-                and the "why" behind decisions.
-            </p>
+            <p>Restart Claude Code. Try <code>/track</code></p>
         </div>
 
-        <div class="install-box">
-            <p class="header">═══ INSTALLATION ═══</p>
-            <p class="warning">
-                ⚠ Security note: Review the script before running it.
-            </p>
-            <p style="margin-top: 1rem;">
-                <span class="numbered-item">1. View the installer script:</span>
-            </p>
-            <div class="code-block">
-                <code><a href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh">github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh</a></code>
-            </div>
-            <p>
-                <span class="numbered-item">2. Verify it only creates files in ~/cmd/cardenas/ and ~/.claude/</span>
-            </p>
-            <p>
-                <span class="numbered-item">3. Download and run:</span>
-            </p>
-            <div class="code-block">
-                <code><span class="command">curl</span> -O https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/install.sh
-<span class="command">chmod</span> +x install.sh
-<span class="command">./install.sh</span></code>
-            </div>
-            <p>
-                <span class="numbered-item">4. Restart Claude Code</span>
-            </p>
-            <p>
-                <span class="numbered-item">5. Try: <span class="command">/track "Just installed Cárdenas"</span></span>
-            </p>
-        </div>
-
-        <div class="section">
-            <p class="section-header">═══ AFTER INSTALL ═══</p>
-            <div class="code-block">
-                <code><span class="comment"># Log activities</span>
-<span class="command">~/cmd/cardenas/track</span> "Starting work on the new feature"
-
-<span class="comment"># Or use Claude Code skills</span>
-<span class="command">/track</span> "Had a breakthrough on the API design"
-<span class="command">/today</span>
-<span class="command">/week</span>
-<span class="command">/goals</span></code>
-            </div>
-        </div>
-
-        <div class="footer">
+        <p class="footer">
             <a href="https://github.com/jonbell-lot23/cardenas-starter">source</a>
-        </div>
+        </p>
     </div>
 </body>
 </html>
