@@ -36,7 +36,7 @@ echo ""
 echo "This script will:"
 echo ""
 echo "  1. CREATE directories:"
-echo "     - ~/cmd/cardenas/ (or your chosen location)"
+echo "     - ./cardenas/ (or your chosen location)"
 echo "     - ~/.claude/commands/ (for slash commands)"
 echo "     - ~/.claude/agents/ (for agents)"
 echo ""
@@ -100,11 +100,12 @@ echo -e "${BLUE}═══ SETUP QUESTIONS ═══${NC}"
 echo ""
 
 # Install directory
+DEFAULT_DIR="$(pwd)/cardenas"
 echo "Where should I install Cárdenas?"
-echo "  Default: ~/cmd/cardenas"
+echo "  Default: $DEFAULT_DIR"
 echo ""
-read -p "Install directory [~/cmd/cardenas]: " INSTALL_DIR
-INSTALL_DIR="${INSTALL_DIR:-$HOME/cmd/cardenas}"
+read -p "Install directory [$DEFAULT_DIR]: " INSTALL_DIR
+INSTALL_DIR="${INSTALL_DIR:-$DEFAULT_DIR}"
 INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
 
 echo ""
