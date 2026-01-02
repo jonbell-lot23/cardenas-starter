@@ -1,20 +1,18 @@
 # Cárdenas
 
-A personal activity tracker for conversational logging.
+A personal activity tracker for Claude Code.
 
-**[cardenas-public.vercel.app](https://cardenas-public.vercel.app)**
+**[cardenas.lot23.com](https://cardenas.lot23.com)**
 
-## Quick Install
+## Install
 
-1. [Review the install script](install.sh) - it creates files in `~/cmd/cardenas/` and `~/.claude/`
-2. Run:
-```bash
-curl -O https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/install.sh
-chmod +x install.sh
-./install.sh
-```
-3. Restart Claude Code
-4. Try: `/track "Just installed Cárdenas"`
+Open Claude Code and say:
+
+> Hi Claude, I'm thinking of installing this script. Can you confirm it's safe? If so, let's walk through the setup.
+>
+> https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh
+
+Claude will review the script, explain what it does, and help you install it safely.
 
 ## Extending Cárdenas
 
