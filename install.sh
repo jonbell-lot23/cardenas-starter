@@ -111,12 +111,11 @@ INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
 
 echo ""
 
-# Other trackers
-echo "Do you use any other tracking systems I should know about?"
-echo "  (e.g., OmniFocus, Todoist, Apple Reminders, Notion)"
-echo "  This helps me understand your workflow."
+# Other agents
+echo "Do you have any other Claude Code agents I should know about?"
+echo "  (So I don't step on their toes)"
 echo ""
-read -p "Other systems (or press Enter to skip): " OTHER_TRACKERS
+read -p "Other agents (or press Enter to skip): " OTHER_AGENTS
 
 echo ""
 
@@ -137,7 +136,7 @@ echo ""
 echo -e "${BLUE}═══ READY TO INSTALL ═══${NC}"
 echo ""
 echo "  Location: $INSTALL_DIR"
-[[ -n "$OTHER_TRACKERS" ]] && echo "  Other systems: $OTHER_TRACKERS"
+[[ -n "$OTHER_AGENTS" ]] && echo "  Other agents: $OTHER_AGENTS"
 echo "  Version: $CARDENAS_VERSION"
 echo ""
 read -p "Install now? [Y/n] " CONFIRM
@@ -411,7 +410,7 @@ echo "$CARDENAS_VERSION" > "$VERSION_FILE"
 cat > "$INSTALL_DIR/.cardenas-config" << CONFIG
 CARDENAS_VERSION=$CARDENAS_VERSION
 INSTALL_DIR=$INSTALL_DIR
-OTHER_TRACKERS=$OTHER_TRACKERS
+OTHER_AGENTS=$OTHER_AGENTS
 USE_CASE=$USE_CASE
 INSTALLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 CONFIG
