@@ -35,7 +35,7 @@
 
       .tagline {
         opacity: 0.8;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
       }
 
       p {
@@ -49,35 +49,57 @@
         white-space: pre;
       }
 
-      .install {
-        margin-top: 2.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.3);
-      }
-
       a {
         color: #fff;
       }
 
-      code {
-        background: rgba(255, 255, 255, 0.15);
-        padding: 0.2rem 0.4rem;
-        border-radius: 3px;
-        font-size: 0.9em;
+      .install-box {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        margin: 1.5rem 0;
+        cursor: pointer;
+        position: relative;
+        font-size: 0.85rem;
+        transition: background 0.2s;
       }
 
-      .code-block {
-        background: rgba(0, 0, 0, 0.2);
-        padding: 1rem;
-        margin: 1rem 0;
-        border-radius: 4px;
-        overflow-x: auto;
+      .install-box:hover {
+        background: rgba(0, 0, 0, 0.4);
+      }
+
+      .install-box code {
+        display: block;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .install-box .hint {
+        opacity: 0.6;
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+      }
+
+      .install-box.copied .hint {
+        opacity: 1;
+      }
+
+      .more-link {
+        font-size: 0.85rem;
+        opacity: 0.7;
       }
 
       .footer {
-        margin-top: 2.5rem;
-        opacity: 0.6;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        opacity: 0.7;
         font-size: 0.85rem;
+      }
+
+      .name-explanation {
+        margin-top: 2rem;
+        opacity: 0.8;
+        font-size: 0.9rem;
       }
     </style>
   </head>
@@ -93,11 +115,20 @@
 ██║     ██╔══██║██╔══██╗██║  ██║██╔══╝  ██║╚██╗██║██╔══██║╚════██║
 ╚██████╗██║  ██║██║  ██║██████╔╝███████╗██║ ╚████║██║  ██║███████║
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
-        </pre
-      >
+      </pre>
       <p class="tagline">a personal activity tracker for Claude Code</p>
 
-      <p>
+      <p><b>Install:</b></p>
+      <div class="install-box" onclick="copyInstall()">
+        <code>curl -fsSL https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/install.sh | bash</code>
+        <div class="hint">click to copy</div>
+      </div>
+      <p class="more-link">
+        <a href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh">review the script first</a> ·
+        restart Claude Code after install · try <code>/track</code>
+      </p>
+
+      <p style="margin-top: 2rem;">
         <b>Step one:</b> tell Claude what you're working on, how you're feeling,
         or what you need to remember:
       </p>
@@ -117,9 +148,9 @@
       </p>
 
       <p>
-        <b>Step two:</b></p>The system gets more valuable over time, so you can ask bigger questions:
+        <b>Step two:</b> The system gets more valuable over time, so you can ask bigger questions:
       </p>
-      
+
       <pre class="examples">
 +---------------------------------------------+
 |  "what am I avoiding?"                      |
@@ -129,34 +160,36 @@
       </pre>
 
       <p>
-        <b>Step three:</b></p>
+        <b>Step three:</b>
         As you get more data, it's easy to wire it up to other things. In my setup, I have it connected to my OmniFocus, Google Calendar, Granola, and my writing projects.
       </p>
       <p>
         But what really lights things up is getting started with simple daily reflections. Just a few sentences each day can help you see patterns over time.
       </p>
 
-      </p>
-
-      <div class="install">
-        <p>
-          <strong>Install:</strong>
-          <a
-            href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh"
-            >review the script</a
-          >, then:
-        </p>
-        <div class="code-block">
-          curl -O
-          https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/install.sh
-          chmod +x install.sh && ./install.sh
-        </div>
-        <p>Restart Claude Code. Try <code>/track</code></p>
+      <div class="name-explanation">
+        <b>The name:</b> García López de Cárdenas was the first European to see the Grand Canyon in 1540. He saw the scale but couldn't comprehend it fully—which captures the feeling of looking at your own activity data. The system helps you witness the vastness of what you've accomplished, even when you can't fully grasp it in the moment.
       </div>
 
       <p class="footer">
         <a href="https://github.com/jonbell-lot23/cardenas-starter">source</a>
       </p>
     </div>
+
+    <script>
+      function copyInstall() {
+        const cmd = 'curl -fsSL https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/install.sh | bash';
+        navigator.clipboard.writeText(cmd).then(() => {
+          const box = document.querySelector('.install-box');
+          const hint = box.querySelector('.hint');
+          hint.textContent = 'copied!';
+          box.classList.add('copied');
+          setTimeout(() => {
+            hint.textContent = 'click to copy';
+            box.classList.remove('copied');
+          }, 2000);
+        });
+      }
+    </script>
   </body>
 </html>
