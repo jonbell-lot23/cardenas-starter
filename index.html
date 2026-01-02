@@ -83,12 +83,14 @@
 
       .shooting-star {
         position: fixed;
-        font-family: "Courier New", monospace;
+        font-family: "Courier New", Courier, monospace;
         color: #7dd3fc;
-        font-size: 14px;
+        font-size: 12px;
+        line-height: 1.1;
         pointer-events: none;
         opacity: 0;
-        white-space: nowrap;
+        white-space: pre;
+        z-index: 1000;
       }
 
       @keyframes shoot {
@@ -96,14 +98,20 @@
           opacity: 1;
           transform: translate(0, 0);
         }
+        30% {
+          opacity: 0.9;
+        }
+        60% {
+          opacity: 0.5;
+        }
         100% {
           opacity: 0;
-          transform: translate(200px, 150px);
+          transform: translate(400px, 300px);
         }
       }
 
       .shooting-star.animate {
-        animation: shoot 0.8s ease-out forwards;
+        animation: shoot 1.2s ease-out forwards;
       }
     </style>
   </head>
@@ -197,17 +205,24 @@
 
     </div>
 
-    <div class="shooting-star" id="star">*===</div>
+    <pre class="shooting-star" id="star">
+    ╔╗
+   ╔╝╚╗
+   ╚╗╔╝━━━━━━━━━━━━━━━━
+    ╚╝  ═══════════════════
+        ────────────────────────
+            ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+                · · · · · · · · · ·</pre>
 
     <script>
       function launchStar() {
         const star = document.getElementById('star');
-        const box = document.querySelector('.install-box');
-        const rect = box.getBoundingClientRect();
+        const container = document.querySelector('.container');
+        const rect = container.getBoundingClientRect();
 
-        // Start from right side of the install box
-        star.style.top = (rect.top + 20) + 'px';
-        star.style.left = (rect.right - 50) + 'px';
+        // Start from upper right of the content area
+        star.style.top = '80px';
+        star.style.left = (rect.right + 20) + 'px';
 
         // Remove and re-add class to restart animation
         star.classList.remove('animate');
