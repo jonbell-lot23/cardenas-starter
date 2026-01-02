@@ -111,23 +111,28 @@ INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
 
 echo ""
 
-# Other agents
-echo "Do you have any other Claude Code agents I should know about?"
-echo "  (So I don't step on their toes)"
-echo ""
-read -p "Other agents (or press Enter to skip): " OTHER_AGENTS
-
-echo ""
-
-# Use case
-echo "What will you mainly use this for?"
-echo "  1) Daily activity logging"
-echo "  2) Goal tracking"
-echo "  3) Mood/health tracking"
-echo "  4) All of the above"
-echo ""
-read -p "Choice [4]: " USE_CASE
-USE_CASE="${USE_CASE:-4}"
+# Check for existing agents
+AGENTS_DIR="$HOME/.claude/agents"
+OTHER_AGENTS=""
+if [[ -d "$AGENTS_DIR" ]] && [[ -n "$(ls -A "$AGENTS_DIR" 2>/dev/null)" ]]; then
+    AGENT_COUNT=$(ls -1 "$AGENTS_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ')
+    if [[ "$AGENT_COUNT" -gt 0 ]]; then
+        echo "I notice you have $AGENT_COUNT other agent(s) in ~/.claude/agents/"
+        echo "Mind if I take a look to see if there are any conflicts or"
+        echo "opportunities to work better together?"
+        echo ""
+        read -p "Can I analyze your existing agents? [Y/n] " ANALYZE_AGENTS
+        if [[ "$ANALYZE_AGENTS" != "n" && "$ANALYZE_AGENTS" != "N" ]]; then
+            echo ""
+            echo "Found agents:"
+            for agent in "$AGENTS_DIR"/*.md; do
+                [[ -f "$agent" ]] && echo "  - $(basename "$agent" .md)"
+            done
+            OTHER_AGENTS=$(ls -1 "$AGENTS_DIR"/*.md 2>/dev/null | xargs -I {} basename {} .md | tr '\n' ',' | sed 's/,$//')
+            echo ""
+        fi
+    fi
+fi
 
 echo ""
 
@@ -411,7 +416,6 @@ cat > "$INSTALL_DIR/.cardenas-config" << CONFIG
 CARDENAS_VERSION=$CARDENAS_VERSION
 INSTALL_DIR=$INSTALL_DIR
 OTHER_AGENTS=$OTHER_AGENTS
-USE_CASE=$USE_CASE
 INSTALLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 CONFIG
 
