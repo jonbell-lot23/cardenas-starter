@@ -81,37 +81,26 @@
         margin-top: 2rem;
       }
 
-      .shooting-star {
+      .firework {
         position: fixed;
         font-family: "Courier New", Courier, monospace;
         color: #7dd3fc;
-        font-size: 12px;
-        line-height: 1.1;
+        font-size: 10px;
+        line-height: 1.0;
         pointer-events: none;
         opacity: 0;
         white-space: pre;
         z-index: 1000;
+        text-align: center;
       }
 
-      @keyframes shoot {
-        0% {
-          opacity: 1;
-          transform: translate(0, 0);
-        }
-        30% {
-          opacity: 0.9;
-        }
-        60% {
-          opacity: 0.5;
-        }
-        100% {
-          opacity: 0;
-          transform: translate(400px, 300px);
-        }
+      .firework.visible {
+        opacity: 1;
       }
 
-      .shooting-star.animate {
-        animation: shoot 1.2s ease-out forwards;
+      .firework.fade {
+        opacity: 0;
+        transition: opacity 0.4s ease-out;
       }
     </style>
   </head>
@@ -205,29 +194,125 @@
 
     </div>
 
-    <pre class="shooting-star" id="star">
-    ╔╗
-   ╔╝╚╗
-   ╚╗╔╝━━━━━━━━━━━━━━━━
-    ╚╝  ═══════════════════
-        ────────────────────────
-            ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-                · · · · · · · · · ·</pre>
+    <pre class="firework" id="firework"></pre>
 
     <script>
-      function launchStar() {
-        const star = document.getElementById('star');
+      const frames = [
+        // Frame 1: tiny spark
+        `
+    *
+`,
+        // Frame 2: small burst
+        `
+    ·
+   *+*
+    ·
+`,
+        // Frame 3: growing
+        `
+      .
+    · | ·
+   --*+*--
+    · | ·
+      '
+`,
+        // Frame 4: bigger
+        `
+        .
+      ' | '
+    ·   |   ·
+   ----*+*----
+    ·   |   ·
+      · | ·
+        '
+`,
+        // Frame 5: explosion
+        `
+          .
+        · | ·
+      '   |   '
+    ·     |     ·
+   ------*+*------
+    ·     |     ·
+      ·   |   ·
+        · | ·
+          '
+`,
+        // Frame 6: full burst with sparkles
+        `
+            ✦
+          · | ·
+        '   |   '
+      ·  ·  |  ·  ·
+    '       |       '
+   --------*+*--------
+    '       |       '
+      ·  ·  |  ·  ·
+        ·   |   ·
+          · | ·
+            ✦
+`,
+        // Frame 7: expanding outward
+        `
+              ·
+            . | .
+          ·   |   ·
+        .  ·  |  ·  .
+      ·       |       ·
+    .    ·    |    ·    .
+   ----------===----------
+    .    ·    |    ·    .
+      ·       |       ·
+        ·  ·  |  ·  ·
+          ·   |   ·
+            · | ·
+              ·
+`,
+        // Frame 8: fading out
+        `
+                ·
+              .   .
+            ·       ·
+          .    ·    .
+        ·           ·
+      .       ·       .
+    ·                   ·
+              ·
+    ·                   ·
+      ·       ·       ·
+        ·           ·
+          ·    ·    ·
+            ·     ·
+              · ·
+`
+      ];
+
+      function launchFirework() {
+        const fw = document.getElementById('firework');
         const container = document.querySelector('.container');
         const rect = container.getBoundingClientRect();
 
-        // Start from upper right of the content area
-        star.style.top = '80px';
-        star.style.left = (rect.right + 20) + 'px';
+        // Position in the empty right area
+        fw.style.top = '120px';
+        fw.style.left = (rect.right + 80) + 'px';
 
-        // Remove and re-add class to restart animation
-        star.classList.remove('animate');
-        void star.offsetWidth; // Force reflow
-        star.classList.add('animate');
+        let frame = 0;
+        fw.classList.remove('fade');
+        fw.classList.add('visible');
+
+        const interval = setInterval(() => {
+          if (frame < frames.length) {
+            fw.textContent = frames[frame];
+            frame++;
+          } else {
+            clearInterval(interval);
+            fw.classList.add('fade');
+            setTimeout(() => {
+              fw.classList.remove('visible', 'fade');
+              fw.textContent = '';
+            }, 400);
+          }
+        }, 100);
       }
 
       function copyInstall() {
@@ -241,7 +326,7 @@ https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh`;
             "[click to copy]",
             "[copied!]      "
           );
-          launchStar();
+          launchFirework();
           setTimeout(() => {
             box.textContent = original;
           }, 2000);
