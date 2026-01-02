@@ -100,9 +100,10 @@ echo -e "${BLUE}═══ SETUP QUESTIONS ═══${NC}"
 echo ""
 
 # Install directory
-DEFAULT_DIR="$(pwd)/cardenas"
+DEFAULT_DIR="$HOME/cardenas"
 echo "Where should I install Cárdenas?"
 echo "  Default: $DEFAULT_DIR"
+echo "  (You can enter any path, e.g. ~/projects/cardenas)"
 echo ""
 read -p "Install directory [$DEFAULT_DIR]: " INSTALL_DIR
 INSTALL_DIR="${INSTALL_DIR:-$DEFAULT_DIR}"
