@@ -16,6 +16,20 @@ chmod +x install.sh
 3. Restart Claude Code
 4. Try: `/track "Just installed Cárdenas"`
 
+## Extending Cárdenas
+
+The starter gives you basic activity tracking. Want more?
+
+See **[plugins/README.md](plugins/README.md)** for patterns and ideas:
+- Query scripts for searching history
+- Goals tracking across time horizons
+- Health data integration
+- AI-generated summaries
+- MCP server for Claude Desktop
+- And more...
+
+These are patterns, not prescriptions. Build what serves you.
+
 ## License
 
 MIT
