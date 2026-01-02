@@ -1,0 +1,371 @@
+#!/bin/bash
+set -euo pipefail
+
+ROOT="$HOME/cmd/common/cardenas"
+GOALS_FILE="$ROOT/goals/active.json"
+REFLECTIONS_DIR="$ROOT/goals/reflections"
+
+usage() {
+    cat << 'EOF'
+Goal-Review - Review goals and progress
+
+USAGE:
+    goal-review morning      Morning briefing: relevant goals for today/week
+    goal-review evening      Evening summary: today's goal progress
+    goal-review status       Full status of all active goals
+    goal-review weekly       This week's goal progress
+    goal-review monthly      This month's goal progress
+
+EXAMPLES:
+    goal-review morning      # Start of day
+    goal-review evening      # End of day
+    goal-review status       # Full overview
+EOF
+}
+
+morning_review() {
+    python3 << 'PYTHON'
+import json
+import os
+from datetime import datetime
+
+root = os.path.expanduser("~/cmd/common/cardenas")
+goals_file = f"{root}/goals/active.json"
+
+try:
+    with open(goals_file, 'r') as f:
+        data = json.load(f)
+except:
+    print("No goals set yet. Use 'goals add' to create some.")
+    exit(0)
+
+goals = [g for g in data.get("goals", []) if g.get("status") == "active"]
+
+if not goals:
+    print("No active goals. Use 'goals add' to create some.")
+    exit(0)
+
+print("=" * 50)
+print("  MORNING GOAL BRIEFING")
+print("=" * 50)
+
+# Weekly goals - most immediate
+weekly = [g for g in goals if g.get("horizon") == "weekly"]
+if weekly:
+    print("\n📅 THIS WEEK:")
+    for g in weekly:
+        cat = "🏢" if g.get("category") == "work" else "🏠"
+        print(f"  {cat} {g['title']}")
+
+# Monthly goals
+monthly = [g for g in goals if g.get("horizon") == "monthly"]
+if monthly:
+    print("\n📆 THIS MONTH:")
+    for g in monthly:
+        cat = "🏢" if g.get("category") == "work" else "🏠"
+        print(f"  {cat} {g['title']}")
+
+# Quarterly goals
+quarterly = [g for g in goals if g.get("horizon") == "quarterly"]
+if quarterly:
+    print("\n🎯 THIS QUARTER:")
+    for g in quarterly:
+        cat = "🏢" if g.get("category") == "work" else "🏠"
+        print(f"  {cat} {g['title']}")
+
+# Yearly and life (context)
+yearly = [g for g in goals if g.get("horizon") == "yearly"]
+life = [g for g in goals if g.get("horizon") == "life"]
+if yearly or life:
+    print("\n🌟 BIGGER PICTURE:")
+    for g in yearly:
+        print(f"  [Year] {g['title']}")
+    for g in life:
+        print(f"  [Life] {g['title']}")
+
+# Work vs Personal split
+work_goals = [g for g in goals if g.get("category") == "work"]
+personal_goals = [g for g in goals if g.get("category") == "personal"]
+
+print("\n" + "-" * 50)
+print(f"  🏢 Work goals: {len(work_goals)} | 🏠 Personal goals: {len(personal_goals)}")
+print("-" * 50)
+PYTHON
+}
+
+evening_review() {
+    python3 << 'PYTHON'
+import json
+import os
+from datetime import datetime
+
+root = os.path.expanduser("~/cmd/common/cardenas")
+goals_file = f"{root}/goals/active.json"
+today = datetime.now().strftime("%Y-%m-%d")
+reflections_file = f"{root}/goals/reflections/{today}.json"
+activities_file = f"{root}/activity/raw/daily/{today}.json"
+
+print("=" * 50)
+print("  EVENING GOAL REVIEW")
+print("=" * 50)
+
+# Load goals
+try:
+    with open(goals_file, 'r') as f:
+        goals_data = json.load(f)
+    goals = {g["id"]: g for g in goals_data.get("goals", []) if g.get("status") == "active"}
+except:
+    goals = {}
+
+# Load today's reflections
+if os.path.exists(reflections_file):
+    with open(reflections_file, 'r') as f:
+        reflections = json.load(f)
+else:
+    reflections = {"reflections": [], "unaligned_activities": []}
+
+# Load today's activities
+try:
+    with open(activities_file, 'r') as f:
+        activities = json.load(f)
+except:
+    activities = []
+
+# Goals with progress today
+goals_with_progress = set()
+print("\n✅ GOAL PROGRESS TODAY:")
+if reflections.get("reflections"):
+    for r in reflections["reflections"]:
+        goal_id = r.get("goal_id", "")
+        goals_with_progress.add(goal_id)
+        goal_title = goals.get(goal_id, {}).get("title", goal_id)
+        print(f"  • {goal_title}")
+        print(f"    → {r['progress']}")
+else:
+    print("  No progress logged. Use 'goal-reflect' to log.")
+
+# Goals without progress
+goals_without = [g for gid, g in goals.items() if gid not in goals_with_progress]
+if goals_without:
+    print("\n⏸️  NO PROGRESS TODAY:")
+    for g in goals_without:
+        cat = "🏢" if g.get("category") == "work" else "🏠"
+        print(f"  {cat} {g['title']}")
+
+# Unaligned activities
+if reflections.get("unaligned_activities"):
+    print("\n⚠️  UNALIGNED ACTIVITIES:")
+    for u in reflections["unaligned_activities"]:
+        print(f"  • {u['note']}")
+
+# Activity count
+print(f"\n📊 Total activities tracked today: {len(activities)}")
+print("-" * 50)
+PYTHON
+}
+
+full_status() {
+    python3 << 'PYTHON'
+import json
+import os
+from datetime import datetime, timedelta
+
+root = os.path.expanduser("~/cmd/common/cardenas")
+goals_file = f"{root}/goals/active.json"
+reflections_dir = f"{root}/goals/reflections"
+
+try:
+    with open(goals_file, 'r') as f:
+        data = json.load(f)
+except:
+    print("No goals set yet.")
+    exit(0)
+
+goals = data.get("goals", [])
+active = [g for g in goals if g.get("status") == "active"]
+paused = [g for g in goals if g.get("status") == "paused"]
+
+print("=" * 50)
+print("  FULL GOAL STATUS")
+print("=" * 50)
+
+# Count reflections per goal in last 7 days
+reflection_counts = {}
+for i in range(7):
+    date = (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d")
+    ref_file = f"{reflections_dir}/{date}.json"
+    if os.path.exists(ref_file):
+        with open(ref_file, 'r') as f:
+            ref_data = json.load(f)
+        for r in ref_data.get("reflections", []):
+            gid = r.get("goal_id", "")
+            reflection_counts[gid] = reflection_counts.get(gid, 0) + 1
+
+horizons = ["life", "yearly", "quarterly", "monthly", "weekly"]
+for h in horizons:
+    h_goals = [g for g in active if g.get("horizon") == h]
+    if h_goals:
+        print(f"\n=== {h.upper()} ===")
+        for g in h_goals:
+            cat = "🏢" if g.get("category") == "work" else "🏠"
+            progress_count = reflection_counts.get(g["id"], 0)
+            momentum = "🔥" if progress_count >= 3 else ("📈" if progress_count >= 1 else "💤")
+            print(f"  {cat} {momentum} {g['title']}")
+            print(f"      ID: {g['id']} | Progress entries (7d): {progress_count}")
+            if g.get("parent_id"):
+                print(f"      Parent: {g['parent_id']}")
+
+if paused:
+    print("\n=== PAUSED ===")
+    for g in paused:
+        print(f"  ○ {g['title']}")
+
+print("\n" + "-" * 50)
+print(f"Active: {len(active)} | Paused: {len(paused)}")
+print("-" * 50)
+PYTHON
+}
+
+weekly_review() {
+    python3 << 'PYTHON'
+import json
+import os
+from datetime import datetime, timedelta
+
+root = os.path.expanduser("~/cmd/common/cardenas")
+goals_file = f"{root}/goals/active.json"
+reflections_dir = f"{root}/goals/reflections"
+
+print("=" * 50)
+print("  WEEKLY GOAL REVIEW")
+print("=" * 50)
+
+# Load goals
+try:
+    with open(goals_file, 'r') as f:
+        goals_data = json.load(f)
+    goals = {g["id"]: g for g in goals_data.get("goals", [])}
+except:
+    goals = {}
+
+# Collect reflections from last 7 days
+all_reflections = []
+all_unaligned = []
+for i in range(7):
+    date = (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d")
+    ref_file = f"{reflections_dir}/{date}.json"
+    if os.path.exists(ref_file):
+        with open(ref_file, 'r') as f:
+            data = json.load(f)
+        for r in data.get("reflections", []):
+            r["date"] = date
+            all_reflections.append(r)
+        for u in data.get("unaligned_activities", []):
+            u["date"] = date
+            all_unaligned.append(u)
+
+# Group by goal
+goal_progress = {}
+for r in all_reflections:
+    gid = r.get("goal_id", "unknown")
+    if gid not in goal_progress:
+        goal_progress[gid] = []
+    goal_progress[gid].append(r)
+
+print("\n📊 GOAL PROGRESS THIS WEEK:\n")
+for gid, entries in goal_progress.items():
+    goal = goals.get(gid, {"title": gid})
+    print(f"  🎯 {goal.get('title', gid)} ({len(entries)} entries)")
+    for e in entries[-3:]:  # Show last 3
+        print(f"     [{e['date']}] {e['progress']}")
+
+if all_unaligned:
+    print(f"\n⚠️  UNALIGNED ACTIVITIES ({len(all_unaligned)} this week)")
+
+# Goals with no progress
+goals_with_progress = set(goal_progress.keys())
+active_goals = [g for g in goals.values() if g.get("status") == "active"]
+no_progress = [g for g in active_goals if g["id"] not in goals_with_progress]
+if no_progress:
+    print("\n💤 NO PROGRESS THIS WEEK:")
+    for g in no_progress:
+        print(f"  • {g['title']}")
+
+print("\n" + "-" * 50)
+PYTHON
+}
+
+monthly_review() {
+    python3 << 'PYTHON'
+import json
+import os
+from datetime import datetime, timedelta
+
+root = os.path.expanduser("~/cmd/common/cardenas")
+goals_file = f"{root}/goals/active.json"
+reflections_dir = f"{root}/goals/reflections"
+
+print("=" * 50)
+print("  MONTHLY GOAL REVIEW")
+print("=" * 50)
+
+# Load goals
+try:
+    with open(goals_file, 'r') as f:
+        goals_data = json.load(f)
+    goals = {g["id"]: g for g in goals_data.get("goals", [])}
+except:
+    goals = {}
+
+# Collect reflections from last 30 days
+goal_progress = {}
+for i in range(30):
+    date = (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d")
+    ref_file = f"{reflections_dir}/{date}.json"
+    if os.path.exists(ref_file):
+        with open(ref_file, 'r') as f:
+            data = json.load(f)
+        for r in data.get("reflections", []):
+            gid = r.get("goal_id", "unknown")
+            if gid not in goal_progress:
+                goal_progress[gid] = 0
+            goal_progress[gid] += 1
+
+print("\n📊 GOAL MOMENTUM (last 30 days):\n")
+
+# Sort by progress count
+sorted_goals = sorted(goal_progress.items(), key=lambda x: x[1], reverse=True)
+for gid, count in sorted_goals:
+    goal = goals.get(gid, {"title": gid})
+    bar = "█" * min(count, 20)
+    print(f"  {goal.get('title', gid)}")
+    print(f"    {bar} ({count} entries)")
+
+# Goals with no progress
+goals_with_progress = set(goal_progress.keys())
+active_goals = [g for g in goals.values() if g.get("status") == "active"]
+no_progress = [g for g in active_goals if g["id"] not in goals_with_progress]
+if no_progress:
+    print("\n💤 NO PROGRESS THIS MONTH:")
+    for g in no_progress:
+        print(f"  • {g['title']}")
+
+print("\n" + "-" * 50)
+PYTHON
+}
+
+# Main
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 0
+fi
+
+case "$1" in
+    morning)  morning_review ;;
+    evening)  evening_review ;;
+    status)   full_status ;;
+    weekly)   weekly_review ;;
+    monthly)  monthly_review ;;
+    -h|--help|help) usage ;;
+    *)        echo "Unknown command: $1" >&2; usage; exit 1 ;;
+esac

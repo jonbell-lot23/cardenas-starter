@@ -1,0 +1,353 @@
+#!/bin/bash
+set -euo pipefail
+
+ROOT="$HOME/cmd/common/cardenas"
+GOALS_FILE="$ROOT/goals/active.json"
+ARCHIVE_FILE="$ROOT/goals/archive.json"
+
+usage() {
+    cat << 'EOF'
+Goals - Manage your life, yearly, quarterly, monthly, and weekly goals
+
+USAGE:
+    goals add <title> [options]     Add a new goal
+    goals list [options]            List active goals
+    goals complete <id>             Mark goal as completed
+    goals pause <id>                Pause a goal
+    goals resume <id>               Resume a paused goal
+    goals show <id>                 Show details of a goal
+    goals edit <id> <field> <value> Edit a goal field
+
+OPTIONS for 'add':
+    --horizon <type>    life, yearly, quarterly, monthly, weekly (default: quarterly)
+    --category <type>   work, personal (default: personal)
+    --parent <id>       Parent goal ID (optional)
+    --notes <text>      Additional notes (optional)
+
+OPTIONS for 'list':
+    --horizon <type>    Filter by horizon
+    --category <type>   Filter by category (work/personal)
+    --all               Include paused goals
+
+EXAMPLES:
+    goals add "Ship Kaching v1" --horizon monthly --category personal
+    goals add "Exercise 4x/week" --horizon quarterly --parent g-2025-life-health
+    goals list --category work
+    goals list --horizon weekly
+    goals complete g-2025-q1-fitness
+EOF
+}
+
+# Generate a goal ID
+generate_id() {
+    local title="$1"
+    local horizon="$2"
+    local slug=$(echo "$title" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-' | head -c 30)
+    local year=$(date +%Y)
+    local quarter="q$((( $(date +%-m) - 1) / 3 + 1))"
+
+    case "$horizon" in
+        life)     echo "g-life-$slug" ;;
+        yearly)   echo "g-$year-$slug" ;;
+        quarterly) echo "g-$year-$quarter-$slug" ;;
+        monthly)  echo "g-$(date +%Y-%m)-$slug" ;;
+        weekly)   echo "g-$(date +%Y)-w$(date +%V)-$slug" ;;
+        *)        echo "g-$slug" ;;
+    esac
+}
+
+cmd_add() {
+    local title=""
+    local horizon="quarterly"
+    local category="personal"
+    local parent=""
+    local notes=""
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --horizon)   horizon="$2"; shift 2 ;;
+            --category)  category="$2"; shift 2 ;;
+            --parent)    parent="$2"; shift 2 ;;
+            --notes)     notes="$2"; shift 2 ;;
+            -*)          echo "Unknown option: $1" >&2; exit 1 ;;
+            *)           title="$1"; shift ;;
+        esac
+    done
+
+    if [[ -z "$title" ]]; then
+        echo "Error: Goal title required" >&2
+        exit 1
+    fi
+
+    # Validate horizon
+    case "$horizon" in
+        life|yearly|quarterly|monthly|weekly) ;;
+        *) echo "Error: Invalid horizon. Use: life, yearly, quarterly, monthly, weekly" >&2; exit 1 ;;
+    esac
+
+    # Validate category
+    case "$category" in
+        work|personal) ;;
+        *) echo "Error: Invalid category. Use: work, personal" >&2; exit 1 ;;
+    esac
+
+    local id=$(generate_id "$title" "$horizon")
+    local created=$(date +%Y-%m-%d)
+
+    python3 << PYTHON
+import json
+import sys
+
+goals_file = "$GOALS_FILE"
+goal = {
+    "id": "$id",
+    "title": '''$title''',
+    "horizon": "$horizon",
+    "category": "$category",
+    "parent_id": "$parent" if "$parent" else None,
+    "created": "$created",
+    "status": "active",
+    "notes": '''$notes''' if '''$notes''' else None
+}
+
+# Load existing goals
+try:
+    with open(goals_file, 'r') as f:
+        data = json.load(f)
+except:
+    data = {"goals": []}
+
+# Check for duplicate ID
+for g in data["goals"]:
+    if g["id"] == goal["id"]:
+        print(f"Error: Goal with similar name already exists: {g['id']}", file=sys.stderr)
+        sys.exit(1)
+
+# Add goal
+data["goals"].append(goal)
+
+# Save
+with open(goals_file, 'w') as f:
+    json.dump(data, f, indent=2)
+
+print(f"✓ Added goal: {goal['id']}")
+print(f"  Title: {goal['title']}")
+print(f"  Horizon: {goal['horizon']} | Category: {goal['category']}")
+PYTHON
+}
+
+cmd_list() {
+    local filter_horizon=""
+    local filter_category=""
+    local show_all=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --horizon)  filter_horizon="$2"; shift 2 ;;
+            --category) filter_category="$2"; shift 2 ;;
+            --all)      show_all=true; shift ;;
+            *)          shift ;;
+        esac
+    done
+
+    python3 << PYTHON
+import json
+
+goals_file = "$GOALS_FILE"
+filter_horizon = "$filter_horizon"
+filter_category = "$filter_category"
+show_all = $([[ "$show_all" == "true" ]] && echo "True" || echo "False")
+
+try:
+    with open(goals_file, 'r') as f:
+        data = json.load(f)
+except:
+    data = {"goals": []}
+
+goals = data.get("goals", [])
+
+# Filter
+if filter_horizon:
+    goals = [g for g in goals if g.get("horizon") == filter_horizon]
+if filter_category:
+    goals = [g for g in goals if g.get("category") == filter_category]
+if not show_all:
+    goals = [g for g in goals if g.get("status") == "active"]
+
+if not goals:
+    print("No goals found.")
+else:
+    # Group by horizon
+    horizons = ["life", "yearly", "quarterly", "monthly", "weekly"]
+    for h in horizons:
+        h_goals = [g for g in goals if g.get("horizon") == h]
+        if h_goals:
+            print(f"\n=== {h.upper()} ===")
+            for g in h_goals:
+                status_icon = "●" if g.get("status") == "active" else "○"
+                cat_icon = "🏢" if g.get("category") == "work" else "🏠"
+                parent_note = f" ← {g['parent_id']}" if g.get("parent_id") else ""
+                print(f"  {status_icon} {cat_icon} {g['id']}")
+                print(f"      {g['title']}{parent_note}")
+PYTHON
+}
+
+cmd_complete() {
+    local id="$1"
+
+    python3 << PYTHON
+import json
+from datetime import datetime
+
+goals_file = "$GOALS_FILE"
+archive_file = "$ARCHIVE_FILE"
+goal_id = "$id"
+
+# Load goals
+with open(goals_file, 'r') as f:
+    data = json.load(f)
+
+# Find goal
+goal = None
+remaining = []
+for g in data.get("goals", []):
+    if g["id"] == goal_id:
+        goal = g
+    else:
+        remaining.append(g)
+
+if not goal:
+    print(f"Error: Goal not found: {goal_id}")
+    exit(1)
+
+# Mark completed
+goal["status"] = "completed"
+goal["completed_date"] = datetime.now().strftime("%Y-%m-%d")
+
+# Move to archive
+try:
+    with open(archive_file, 'r') as f:
+        archive = json.load(f)
+except:
+    archive = {"goals": []}
+
+archive["goals"].append(goal)
+
+# Save both files
+data["goals"] = remaining
+with open(goals_file, 'w') as f:
+    json.dump(data, f, indent=2)
+with open(archive_file, 'w') as f:
+    json.dump(archive, f, indent=2)
+
+print(f"✓ Completed: {goal['title']}")
+print(f"  Moved to archive")
+PYTHON
+}
+
+cmd_pause() {
+    local id="$1"
+
+    python3 << PYTHON
+import json
+
+goals_file = "$GOALS_FILE"
+goal_id = "$id"
+
+with open(goals_file, 'r') as f:
+    data = json.load(f)
+
+found = False
+for g in data.get("goals", []):
+    if g["id"] == goal_id:
+        g["status"] = "paused"
+        found = True
+        print(f"✓ Paused: {g['title']}")
+        break
+
+if not found:
+    print(f"Error: Goal not found: {goal_id}")
+    exit(1)
+
+with open(goals_file, 'w') as f:
+    json.dump(data, f, indent=2)
+PYTHON
+}
+
+cmd_resume() {
+    local id="$1"
+
+    python3 << PYTHON
+import json
+
+goals_file = "$GOALS_FILE"
+goal_id = "$id"
+
+with open(goals_file, 'r') as f:
+    data = json.load(f)
+
+found = False
+for g in data.get("goals", []):
+    if g["id"] == goal_id:
+        g["status"] = "active"
+        found = True
+        print(f"✓ Resumed: {g['title']}")
+        break
+
+if not found:
+    print(f"Error: Goal not found: {goal_id}")
+    exit(1)
+
+with open(goals_file, 'w') as f:
+    json.dump(data, f, indent=2)
+PYTHON
+}
+
+cmd_show() {
+    local id="$1"
+
+    python3 << PYTHON
+import json
+
+goals_file = "$GOALS_FILE"
+goal_id = "$id"
+
+with open(goals_file, 'r') as f:
+    data = json.load(f)
+
+for g in data.get("goals", []):
+    if g["id"] == goal_id:
+        print(f"ID:       {g['id']}")
+        print(f"Title:    {g['title']}")
+        print(f"Horizon:  {g['horizon']}")
+        print(f"Category: {g['category']}")
+        print(f"Status:   {g['status']}")
+        print(f"Created:  {g['created']}")
+        if g.get('parent_id'):
+            print(f"Parent:   {g['parent_id']}")
+        if g.get('notes'):
+            print(f"Notes:    {g['notes']}")
+        exit(0)
+
+print(f"Error: Goal not found: {goal_id}")
+exit(1)
+PYTHON
+}
+
+# Main
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 0
+fi
+
+case "$1" in
+    add)      shift; cmd_add "$@" ;;
+    list)     shift; cmd_list "$@" ;;
+    complete) shift; cmd_complete "$@" ;;
+    pause)    shift; cmd_pause "$@" ;;
+    resume)   shift; cmd_resume "$@" ;;
+    show)     shift; cmd_show "$@" ;;
+    help|-h)  usage ;;
+    *)        echo "Unknown command: $1" >&2; usage; exit 1 ;;
+esac
