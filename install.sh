@@ -1,49 +1,144 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════════════════
-# Cárdenas Installer
+# Cárdenas Installer v0.1.0
 # A personal activity tracker for conversational logging
 # ═══════════════════════════════════════════════════════════════════════════
-#
-# WHAT THIS SCRIPT DOES:
-# 1. Creates the cardenas directory with bash scripts (track, read-activity, etc.)
-# 2. Creates Claude Code skills in ~/.claude/commands/ (so /track works)
-# 3. Creates Claude Code agents in ~/.claude/agents/
-# 4. Adds permissions to ~/.claude/settings.json (so no prompts for track)
-#
-# REVIEW THIS SCRIPT BEFORE RUNNING. It modifies:
-# - ~/cmd/cardenas/ (new directory)
-# - ~/.claude/commands/ (new skill files)
-# - ~/.claude/agents/ (new agent files)
-# - ~/.claude/settings.json (adds permissions)
-#
-# ═══════════════════════════════════════════════════════════════════════════
 
-set -e
+CARDENAS_VERSION="0.1.0"
+VERSION_FILE="$HOME/.cardenas-version"
 
 # Colors
-RED='\033[0;31m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo ""
-echo "═══════════════════════════════════════════════════════════════"
-echo "  Cárdenas Installer"
-echo "  A personal activity tracker for conversational logging"
-echo "═══════════════════════════════════════════════════════════════"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "${CYAN}  Hi! I'm Cárdenas.${NC}"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+echo ""
+echo "Before I go wild on your computer, let's be careful."
+echo ""
+echo -e "${YELLOW}It's dangerous to install stuff off the internet directly!${NC}"
+echo ""
+echo "I'm going to show you exactly what this script will do."
+echo "Then you can decide if you trust it."
+echo ""
+read -p "Press Enter to see what I'm about to do... "
+
+# ─── SELF-AUDIT ──────────────────────────────────────────────────────────────
+
+echo ""
+echo -e "${BLUE}═══ SCRIPT AUDIT ═══${NC}"
+echo ""
+echo "This script will:"
+echo ""
+echo "  1. CREATE directories:"
+echo "     - ~/cmd/cardenas/ (or your chosen location)"
+echo "     - ~/.claude/commands/ (for slash commands)"
+echo "     - ~/.claude/agents/ (for agents)"
+echo ""
+echo "  2. CREATE files:"
+echo "     - track (bash script for logging)"
+echo "     - scripts/read-activity (query your history)"
+echo "     - scripts/goals (manage goals)"
+echo "     - scripts/health-log (mood tracking)"
+echo ""
+echo "  3. MODIFY:"
+echo "     - ~/.claude/settings.json (add permissions for the scripts)"
+echo ""
+echo "  4. NOT do:"
+echo "     - Send any data anywhere"
+echo "     - Install any dependencies"
+echo "     - Touch anything outside the directories above"
+echo ""
+echo "Full source: https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh"
 echo ""
 
-# ─── CONFIGURATION ───────────────────────────────────────────────────────────
+read -p "Does this sound okay? [Y/n] " AUDIT_OK
+if [[ "$AUDIT_OK" == "n" || "$AUDIT_OK" == "N" ]]; then
+    echo ""
+    echo "No worries! Take your time to review the script."
+    echo "You can read it at the URL above."
+    exit 0
+fi
 
-INSTALL_DIR="${CARDENAS_DIR:-$HOME/cmd/cardenas}"
-CLAUDE_DIR="$HOME/.claude"
+# ─── VERSION CHECK ───────────────────────────────────────────────────────────
 
-echo -e "${BLUE}Install directory:${NC} $INSTALL_DIR"
-echo -e "${BLUE}Claude config:${NC} $CLAUDE_DIR"
+if [[ -f "$VERSION_FILE" ]]; then
+    INSTALLED_VERSION=$(cat "$VERSION_FILE")
+    echo ""
+    echo -e "${BLUE}═══ EXISTING INSTALLATION DETECTED ═══${NC}"
+    echo ""
+    echo "You have Cárdenas v$INSTALLED_VERSION installed."
+    echo "This installer is v$CARDENAS_VERSION."
+    echo ""
+
+    if [[ "$INSTALLED_VERSION" == "$CARDENAS_VERSION" ]]; then
+        echo "You're already on the latest version!"
+        read -p "Reinstall anyway? [y/N] " REINSTALL
+        if [[ "$REINSTALL" != "y" && "$REINSTALL" != "Y" ]]; then
+            echo "Okay, nothing changed."
+            exit 0
+        fi
+    else
+        echo "This will upgrade your installation."
+        echo "(Your data in activity/, goals/, health/ will be preserved.)"
+        read -p "Continue with upgrade? [Y/n] " UPGRADE
+        if [[ "$UPGRADE" == "n" || "$UPGRADE" == "N" ]]; then
+            exit 0
+        fi
+    fi
+fi
+
+# ─── QUESTIONS ───────────────────────────────────────────────────────────────
+
+echo ""
+echo -e "${BLUE}═══ SETUP QUESTIONS ═══${NC}"
 echo ""
 
-read -p "Proceed with installation? [Y/n] " CONFIRM
+# Install directory
+echo "Where should I install Cárdenas?"
+echo "  Default: ~/cmd/cardenas"
+echo ""
+read -p "Install directory [~/cmd/cardenas]: " INSTALL_DIR
+INSTALL_DIR="${INSTALL_DIR:-$HOME/cmd/cardenas}"
+INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
+
+echo ""
+
+# Other trackers
+echo "Do you use any other tracking systems I should know about?"
+echo "  (e.g., OmniFocus, Todoist, Apple Reminders, Notion)"
+echo "  This helps me understand your workflow."
+echo ""
+read -p "Other systems (or press Enter to skip): " OTHER_TRACKERS
+
+echo ""
+
+# Use case
+echo "What will you mainly use this for?"
+echo "  1) Daily activity logging"
+echo "  2) Goal tracking"
+echo "  3) Mood/health tracking"
+echo "  4) All of the above"
+echo ""
+read -p "Choice [4]: " USE_CASE
+USE_CASE="${USE_CASE:-4}"
+
+echo ""
+
+# ─── CONFIRMATION ────────────────────────────────────────────────────────────
+
+echo -e "${BLUE}═══ READY TO INSTALL ═══${NC}"
+echo ""
+echo "  Location: $INSTALL_DIR"
+[[ -n "$OTHER_TRACKERS" ]] && echo "  Other systems: $OTHER_TRACKERS"
+echo "  Version: $CARDENAS_VERSION"
+echo ""
+read -p "Install now? [Y/n] " CONFIRM
 if [[ "$CONFIRM" == "n" || "$CONFIRM" == "N" ]]; then
     echo "Cancelled."
     exit 0
@@ -61,8 +156,8 @@ mkdir -p "$INSTALL_DIR/activity/summaries/daily"
 mkdir -p "$INSTALL_DIR/goals/reflections"
 mkdir -p "$INSTALL_DIR/health/daily"
 mkdir -p "$INSTALL_DIR/scripts"
-mkdir -p "$CLAUDE_DIR/commands"
-mkdir -p "$CLAUDE_DIR/agents"
+mkdir -p "$HOME/.claude/commands"
+mkdir -p "$HOME/.claude/agents"
 
 echo -e "${GREEN}✓${NC} Directories created"
 
@@ -75,7 +170,8 @@ cat > "$INSTALL_DIR/track" << 'TRACKSCRIPT'
 # Cárdenas - Activity Tracker
 # Usage: track "Your message here"
 
-CARDENAS_DIR="${CARDENAS_DIR:-$HOME/cmd/cardenas}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CARDENAS_DIR="${CARDENAS_DIR:-$SCRIPT_DIR}"
 TODAY=$(date +%Y-%m-%d)
 DAILY_FILE="$CARDENAS_DIR/activity/raw/daily/$TODAY.json"
 
@@ -103,15 +199,12 @@ NEW_ENTRY="{\"time\": \"$TIMESTAMP\", \"activity\": \"$MESSAGE_ESCAPED\"}"
 
 # Read existing content, add new entry
 if command -v jq &> /dev/null; then
-    # Use jq if available
     jq ". += [$NEW_ENTRY]" "$DAILY_FILE" > "$DAILY_FILE.tmp" && mv "$DAILY_FILE.tmp" "$DAILY_FILE"
 else
-    # Fallback: simple append
     CONTENT=$(cat "$DAILY_FILE")
     if [[ "$CONTENT" == "[]" ]]; then
         echo "[$NEW_ENTRY]" > "$DAILY_FILE"
     else
-        # Remove trailing ] and add new entry
         sed -i.bak 's/]$//' "$DAILY_FILE"
         echo ", $NEW_ENTRY]" >> "$DAILY_FILE"
         rm -f "$DAILY_FILE.bak"
@@ -131,48 +224,11 @@ echo -e "${YELLOW}Creating read-activity script...${NC}"
 cat > "$INSTALL_DIR/scripts/read-activity" << 'READSCRIPT'
 #!/bin/bash
 # Cárdenas - Activity Reader
-# Usage: read-activity --today | --week | --days N | --since YYYY-MM-DD | --range START END
+# Usage: read-activity --today | --week | --days N
 
-CARDENAS_DIR="${CARDENAS_DIR:-$HOME/cmd/cardenas}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CARDENAS_DIR="${CARDENAS_DIR:-$(dirname "$SCRIPT_DIR")}"
 DAILY_DIR="$CARDENAS_DIR/activity/raw/daily"
-
-show_help() {
-    echo "Usage: read-activity [option]"
-    echo ""
-    echo "Options:"
-    echo "  --today           Show today's activities"
-    echo "  --week            Show last 7 days"
-    echo "  --days N          Show last N days"
-    echo "  --since DATE      Show from DATE to today"
-    echo "  --range START END Show activities between dates"
-    echo ""
-    echo "Date format: YYYY-MM-DD"
-}
-
-format_entry() {
-    local time="$1"
-    local activity="$2"
-    # Extract just the time portion
-    local time_only=$(echo "$time" | sed 's/T/ /' | cut -d' ' -f2 | cut -d':' -f1-2)
-    echo "  $time_only  $activity"
-}
-
-show_day() {
-    local date="$1"
-    local file="$DAILY_DIR/$date.json"
-
-    if [[ -f "$file" ]]; then
-        echo ""
-        echo "─── $date ───"
-        if command -v jq &> /dev/null; then
-            jq -r '.[] | "\(.time)|\(.activity)"' "$file" 2>/dev/null | while IFS='|' read -r time activity; do
-                format_entry "$time" "$activity"
-            done
-        else
-            cat "$file"
-        fi
-    fi
-}
 
 get_date_n_days_ago() {
     local n="$1"
@@ -183,57 +239,26 @@ get_date_n_days_ago() {
     fi
 }
 
-case "$1" in
-    --today)
-        show_day "$(date +%Y-%m-%d)"
-        ;;
-    --week)
-        for i in {6..0}; do
-            show_day "$(get_date_n_days_ago $i)"
-        done
-        ;;
-    --days)
-        N="${2:-7}"
-        for i in $(seq $((N-1)) -1 0); do
-            show_day "$(get_date_n_days_ago $i)"
-        done
-        ;;
-    --since)
-        START="$2"
-        TODAY=$(date +%Y-%m-%d)
-        current="$START"
-        while [[ "$current" < "$TODAY" || "$current" == "$TODAY" ]]; do
-            show_day "$current"
-            if [[ "$(uname)" == "Darwin" ]]; then
-                current=$(date -j -v+1d -f "%Y-%m-%d" "$current" +%Y-%m-%d)
-            else
-                current=$(date -d "$current + 1 day" +%Y-%m-%d)
-            fi
-        done
-        ;;
-    --range)
-        START="$2"
-        END="$3"
-        current="$START"
-        while [[ "$current" < "$END" || "$current" == "$END" ]]; do
-            show_day "$current"
-            if [[ "$(uname)" == "Darwin" ]]; then
-                current=$(date -j -v+1d -f "%Y-%m-%d" "$current" +%Y-%m-%d)
-            else
-                current=$(date -d "$current + 1 day" +%Y-%m-%d)
-            fi
-        done
-        ;;
-    -h|--help|"")
-        show_help
-        ;;
-    *)
-        echo "Unknown option: $1"
-        show_help
-        exit 1
-        ;;
-esac
+show_day() {
+    local date="$1"
+    local file="$DAILY_DIR/$date.json"
+    if [[ -f "$file" ]]; then
+        echo ""
+        echo "─── $date ───"
+        if command -v jq &> /dev/null; then
+            jq -r '.[] | "  \(.time | split("T")[1] | split(":")[0:2] | join(":"))  \(.activity)"' "$file" 2>/dev/null
+        else
+            cat "$file"
+        fi
+    fi
+}
 
+case "$1" in
+    --today) show_day "$(date +%Y-%m-%d)" ;;
+    --week) for i in {6..0}; do show_day "$(get_date_n_days_ago $i)"; done ;;
+    --days) for i in $(seq $((${2:-7}-1)) -1 0); do show_day "$(get_date_n_days_ago $i)"; done ;;
+    *) echo "Usage: read-activity --today | --week | --days N" ;;
+esac
 echo ""
 READSCRIPT
 
@@ -247,97 +272,32 @@ echo -e "${YELLOW}Creating goals script...${NC}"
 cat > "$INSTALL_DIR/scripts/goals" << 'GOALSSCRIPT'
 #!/bin/bash
 # Cárdenas - Goals Manager
-# Usage: goals list | add "goal" --horizon monthly --category personal
 
-CARDENAS_DIR="${CARDENAS_DIR:-$HOME/cmd/cardenas}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CARDENAS_DIR="${CARDENAS_DIR:-$(dirname "$SCRIPT_DIR")}"
 GOALS_FILE="$CARDENAS_DIR/goals/active.json"
 
-# Initialize if doesn't exist
-if [[ ! -f "$GOALS_FILE" ]]; then
-    echo "[]" > "$GOALS_FILE"
-fi
-
-show_help() {
-    echo "Usage: goals [command]"
-    echo ""
-    echo "Commands:"
-    echo "  list                      List all active goals"
-    echo "  list --category work      List work goals only"
-    echo "  add \"goal\" [options]      Add a new goal"
-    echo ""
-    echo "Options for add:"
-    echo "  --horizon HORIZON         life, yearly, quarterly, monthly, weekly"
-    echo "  --category CATEGORY       work, personal"
-}
-
-list_goals() {
-    local filter_cat="$1"
-
-    if ! command -v jq &> /dev/null; then
-        cat "$GOALS_FILE"
-        return
-    fi
-
-    echo ""
-    echo "Active Goals"
-    echo "════════════"
-
-    if [[ -n "$filter_cat" ]]; then
-        jq -r ".[] | select(.category == \"$filter_cat\") | \"[\(.horizon)] \(.title)\"" "$GOALS_FILE"
-    else
-        jq -r '.[] | "[\(.horizon)] \(.title)"' "$GOALS_FILE"
-    fi
-    echo ""
-}
-
-add_goal() {
-    local title="$1"
-    shift
-
-    local horizon="monthly"
-    local category="personal"
-
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            --horizon) horizon="$2"; shift 2 ;;
-            --category) category="$2"; shift 2 ;;
-            *) shift ;;
-        esac
-    done
-
-    local id=$(date +%s)
-    local created=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-    if command -v jq &> /dev/null; then
-        jq ". += [{\"id\": \"$id\", \"title\": \"$title\", \"horizon\": \"$horizon\", \"category\": \"$category\", \"created\": \"$created\", \"status\": \"active\"}]" "$GOALS_FILE" > "$GOALS_FILE.tmp" && mv "$GOALS_FILE.tmp" "$GOALS_FILE"
-    else
-        echo "jq required for adding goals"
-        exit 1
-    fi
-
-    echo -e "✓ Added goal: $title [$horizon, $category]"
-}
+[[ ! -f "$GOALS_FILE" ]] && echo "[]" > "$GOALS_FILE"
 
 case "$1" in
     list)
-        if [[ "$2" == "--category" ]]; then
-            list_goals "$3"
+        echo ""; echo "Active Goals"; echo "════════════"
+        if command -v jq &> /dev/null; then
+            jq -r '.[] | "[\(.horizon)] \(.title)"' "$GOALS_FILE"
         else
-            list_goals
+            cat "$GOALS_FILE"
         fi
+        echo ""
         ;;
     add)
-        shift
-        add_goal "$@"
+        shift; TITLE="$1"; HORIZON="${3:-monthly}"; CATEGORY="${5:-personal}"
+        ID=$(date +%s); CREATED=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        if command -v jq &> /dev/null; then
+            jq ". += [{\"id\": \"$ID\", \"title\": \"$TITLE\", \"horizon\": \"$HORIZON\", \"category\": \"$CATEGORY\", \"created\": \"$CREATED\"}]" "$GOALS_FILE" > "$GOALS_FILE.tmp" && mv "$GOALS_FILE.tmp" "$GOALS_FILE"
+            echo "✓ Added: $TITLE [$HORIZON]"
+        fi
         ;;
-    -h|--help|"")
-        show_help
-        ;;
-    *)
-        echo "Unknown command: $1"
-        show_help
-        exit 1
-        ;;
+    *) echo "Usage: goals list | goals add \"title\" --horizon monthly --category personal" ;;
 esac
 GOALSSCRIPT
 
@@ -351,59 +311,26 @@ echo -e "${YELLOW}Creating health-log script...${NC}"
 cat > "$INSTALL_DIR/scripts/health-log" << 'HEALTHSCRIPT'
 #!/bin/bash
 # Cárdenas - Health/Mood Logger
-# Usage: health-log mood stress=high energy=low
-#        health-log symptom headache=moderate
 
-CARDENAS_DIR="${CARDENAS_DIR:-$HOME/cmd/cardenas}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CARDENAS_DIR="${CARDENAS_DIR:-$(dirname "$SCRIPT_DIR")}"
 TODAY=$(date +%Y-%m-%d)
 HEALTH_FILE="$CARDENAS_DIR/health/daily/$TODAY.json"
 
-# Initialize if doesn't exist
-if [[ ! -f "$HEALTH_FILE" ]]; then
-    echo "{\"date\": \"$TODAY\", \"mood\": {}, \"symptoms\": {}, \"notes\": []}" > "$HEALTH_FILE"
-fi
-
-TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+[[ ! -f "$HEALTH_FILE" ]] && echo "{\"date\": \"$TODAY\", \"mood\": {}, \"symptoms\": {}, \"notes\": []}" > "$HEALTH_FILE"
 
 case "$1" in
     mood)
         shift
         for item in "$@"; do
-            key="${item%=*}"
-            value="${item#*=}"
+            key="${item%=*}"; value="${item#*=}"
             if command -v jq &> /dev/null; then
                 jq ".mood.$key = \"$value\"" "$HEALTH_FILE" > "$HEALTH_FILE.tmp" && mv "$HEALTH_FILE.tmp" "$HEALTH_FILE"
             fi
-            echo -e "✓ Logged mood: $key = $value"
+            echo "✓ Logged mood: $key = $value"
         done
         ;;
-    symptom)
-        shift
-        for item in "$@"; do
-            key="${item%=*}"
-            value="${item#*=}"
-            if command -v jq &> /dev/null; then
-                jq ".symptoms.$key = \"$value\"" "$HEALTH_FILE" > "$HEALTH_FILE.tmp" && mv "$HEALTH_FILE.tmp" "$HEALTH_FILE"
-            fi
-            echo -e "✓ Logged symptom: $key = $value"
-        done
-        ;;
-    note)
-        shift
-        NOTE="$*"
-        if command -v jq &> /dev/null; then
-            jq ".notes += [{\"time\": \"$TIMESTAMP\", \"note\": \"$NOTE\"}]" "$HEALTH_FILE" > "$HEALTH_FILE.tmp" && mv "$HEALTH_FILE.tmp" "$HEALTH_FILE"
-        fi
-        echo -e "✓ Logged note: $NOTE"
-        ;;
-    *)
-        echo "Usage: health-log [mood|symptom|note] ..."
-        echo ""
-        echo "Examples:"
-        echo "  health-log mood stress=high energy=low"
-        echo "  health-log symptom headache=moderate"
-        echo "  health-log note \"Slept poorly, woke up at 3am\""
-        ;;
+    *) echo "Usage: health-log mood stress=low energy=high" ;;
 esac
 HEALTHSCRIPT
 
@@ -414,200 +341,88 @@ echo -e "${GREEN}✓${NC} health-log script created"
 
 echo -e "${YELLOW}Creating Claude Code skills...${NC}"
 
-# /track skill
-cat > "$CLAUDE_DIR/commands/track.md" << SKILL
+cat > "$HOME/.claude/commands/track.md" << SKILL
 ---
 description: Log activity to Cárdenas
 ---
 
-Log an activity entry using the track command.
+Log an activity entry. Run:
 
-If the user provided arguments, run:
 \`\`\`bash
 $INSTALL_DIR/track "\$ARGUMENTS"
 \`\`\`
 
-If no arguments provided, ask the user what they want to track.
+If no arguments, ask what to track.
 SKILL
 
-# /today skill
-cat > "$CLAUDE_DIR/commands/today.md" << SKILL
+cat > "$HOME/.claude/commands/today.md" << SKILL
 ---
-description: Show today's Cárdenas activities
+description: Show today's activities
 ---
-
-Show today's activity log:
 
 \`\`\`bash
 $INSTALL_DIR/scripts/read-activity --today
 \`\`\`
 SKILL
 
-# /week skill
-cat > "$CLAUDE_DIR/commands/week.md" << SKILL
+cat > "$HOME/.claude/commands/week.md" << SKILL
 ---
-description: Show this week's Cárdenas activities
+description: Show this week's activities
 ---
-
-Show the last 7 days of activities:
 
 \`\`\`bash
 $INSTALL_DIR/scripts/read-activity --week
 \`\`\`
 SKILL
 
-# /goals skill
-cat > "$CLAUDE_DIR/commands/goals.md" << SKILL
----
-description: Show or manage Cárdenas goals
----
-
-If the user wants to see goals, run:
-\`\`\`bash
-$INSTALL_DIR/scripts/goals list
-\`\`\`
-
-If the user wants to add a goal, parse their request and run:
-\`\`\`bash
-$INSTALL_DIR/scripts/goals add "goal title" --horizon [life|yearly|quarterly|monthly|weekly] --category [work|personal]
-\`\`\`
-SKILL
-
-echo -e "${GREEN}✓${NC} Claude skills created (/track, /today, /week, /goals)"
-
-# ─── CREATE CLAUDE AGENT ─────────────────────────────────────────────────────
-
-echo -e "${YELLOW}Creating Claude Code agent...${NC}"
-
-cat > "$CLAUDE_DIR/agents/health-and-mood.md" << AGENT
----
-description: Track health metrics, mood patterns, and personal well-being
-tools:
-  - Read
-  - Bash
-  - Edit
----
-
-You are a health and mood tracking agent for Cárdenas.
-
-Your job is to help the user:
-1. Log mood states (stress, energy, focus)
-2. Track symptoms
-3. Add health notes
-4. Review patterns over time
-
-Use the health-log script:
-\`\`\`bash
-$INSTALL_DIR/scripts/health-log mood stress=low energy=high
-$INSTALL_DIR/scripts/health-log symptom headache=none
-$INSTALL_DIR/scripts/health-log note "Slept well, 8 hours"
-\`\`\`
-
-Health data is stored in: $INSTALL_DIR/health/daily/
-
-Be supportive and non-judgmental. Help the user notice patterns without being preachy.
-AGENT
-
-echo -e "${GREEN}✓${NC} Claude agent created (health-and-mood)"
+echo -e "${GREEN}✓${NC} Claude skills created (/track, /today, /week)"
 
 # ─── UPDATE CLAUDE PERMISSIONS ───────────────────────────────────────────────
 
 echo -e "${YELLOW}Updating Claude Code permissions...${NC}"
 
-SETTINGS_FILE="$CLAUDE_DIR/settings.json"
+SETTINGS_FILE="$HOME/.claude/settings.json"
 
-# Create settings file if it doesn't exist
 if [[ ! -f "$SETTINGS_FILE" ]]; then
     echo '{"permissions": {"allow": [], "deny": []}}' > "$SETTINGS_FILE"
 fi
 
 if command -v jq &> /dev/null; then
-    # Add permissions for Cardenas scripts
-    PERMISSIONS=(
-        "Bash($INSTALL_DIR/track:*)"
-        "Bash($INSTALL_DIR/scripts/*:*)"
-        "Read($INSTALL_DIR/**)"
-        "Edit($INSTALL_DIR/**)"
-    )
-
-    for perm in "${PERMISSIONS[@]}"; do
-        # Check if permission already exists
+    PERMS=("Bash($INSTALL_DIR/track:*)" "Bash($INSTALL_DIR/scripts/*:*)" "Read($INSTALL_DIR/**)" "Edit($INSTALL_DIR/**)")
+    for perm in "${PERMS[@]}"; do
         EXISTS=$(jq -r ".permissions.allow | index(\"$perm\")" "$SETTINGS_FILE")
         if [[ "$EXISTS" == "null" ]]; then
             jq ".permissions.allow += [\"$perm\"]" "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp" && mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
         fi
     done
-
-    echo -e "${GREEN}✓${NC} Permissions added to settings.json"
+    echo -e "${GREEN}✓${NC} Permissions added"
 else
-    echo -e "${YELLOW}!${NC} jq not found - please manually add permissions to $SETTINGS_FILE"
+    echo -e "${YELLOW}!${NC} jq not found - add permissions manually"
 fi
 
-# ─── CREATE README ───────────────────────────────────────────────────────────
+# ─── SAVE VERSION ────────────────────────────────────────────────────────────
 
-echo -e "${YELLOW}Creating README...${NC}"
+echo "$CARDENAS_VERSION" > "$VERSION_FILE"
 
-cat > "$INSTALL_DIR/README.md" << 'README'
-# Cárdenas
+# ─── SAVE CONFIG ─────────────────────────────────────────────────────────────
 
-A personal activity tracker for conversational logging.
-
-## Quick Start
-
-```bash
-# Log an activity
-~/cmd/cardenas/track "Starting work on the new feature"
-
-# See today's activities
-~/cmd/cardenas/scripts/read-activity --today
-
-# See the week
-~/cmd/cardenas/scripts/read-activity --week
-```
-
-## Claude Code Skills
-
-After installation, restart Claude Code. You'll have:
-
-- `/track` - Log an activity
-- `/today` - See today's entries
-- `/week` - See the last 7 days
-- `/goals` - Manage goals
-
-## Philosophy
-
-Capture **depth**, not just summaries:
-- Mental state and emotional context
-- Strategic insights and breakthroughs
-- Why certain approaches are being chosen
-
-**BAD:** "Wrote document"
-**GOOD:** "Mental state: Using work momentum as self-soothing—creating control when system feels chaotic"
-
-## Files
-
-- `activity/raw/daily/` - Daily JSON logs
-- `goals/active.json` - Your goals
-- `health/daily/` - Mood and health data
-
-## The Name
-
-Named after García López de Cárdenas, the first European to see the Grand Canyon in 1540.
-He saw the scale but couldn't comprehend it fully—which perfectly captures the feeling
-of looking at your own activity data.
-README
-
-echo -e "${GREEN}✓${NC} README created"
+cat > "$INSTALL_DIR/.cardenas-config" << CONFIG
+CARDENAS_VERSION=$CARDENAS_VERSION
+INSTALL_DIR=$INSTALL_DIR
+OTHER_TRACKERS=$OTHER_TRACKERS
+USE_CASE=$USE_CASE
+INSTALLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+CONFIG
 
 # ─── DONE ────────────────────────────────────────────────────────────────────
 
 echo ""
-echo "═══════════════════════════════════════════════════════════════"
-echo -e "${GREEN}  Installation complete!${NC}"
-echo "═══════════════════════════════════════════════════════════════"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}  Installation complete! (v$CARDENAS_VERSION)${NC}"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 echo "Next steps:"
-echo "  1. Restart Claude Code (quit and reopen)"
+echo "  1. Restart Claude Code"
 echo "  2. Try: /track \"Just installed Cárdenas\""
 echo "  3. Try: /today"
 echo ""
