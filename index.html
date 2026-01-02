@@ -102,6 +102,82 @@
         opacity: 0;
         transition: opacity 0.4s ease-out;
       }
+
+      /* Mobile title (hidden on desktop) */
+      .mobile-title {
+        display: none;
+        font-size: 2rem;
+        color: #7dd3fc;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Mobile install box */
+      .install-box-mobile {
+        display: none;
+        background: rgba(255,255,255,0.1);
+        padding: 1rem;
+        border-radius: 4px;
+        margin: 1rem 0;
+        cursor: pointer;
+      }
+
+      .install-box-mobile .url {
+        word-break: break-all;
+        font-size: 0.85rem;
+        opacity: 0.9;
+      }
+
+      .install-box-mobile .tap-hint {
+        margin-top: 0.5rem;
+        opacity: 0.7;
+        font-size: 0.85rem;
+      }
+
+      /* Mobile examples */
+      .examples-mobile {
+        display: none;
+        background: rgba(255,255,255,0.1);
+        padding: 1rem;
+        border-radius: 4px;
+        margin: 1.5rem 0;
+      }
+
+      .examples-mobile p {
+        margin-bottom: 0.5rem;
+        opacity: 0.9;
+      }
+
+      .examples-mobile p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Mobile separator */
+      .separator-mobile {
+        display: none;
+        border-top: 1px solid rgba(255,255,255,0.3);
+        margin: 2rem 0;
+      }
+
+      /* Mobile styles */
+      @media (max-width: 700px) {
+        .container {
+          padding: 2rem 1rem;
+        }
+
+        .ascii-art,
+        .install-box,
+        .examples,
+        .firework {
+          display: none;
+        }
+
+        .mobile-title,
+        .install-box-mobile,
+        .examples-mobile,
+        .separator-mobile {
+          display: block;
+        }
+      }
     </style>
   </head>
   <body>
@@ -117,6 +193,7 @@
 ╚██████╗██║  ██║██║  ██║██████╔╝███████╗██║ ╚████║██║  ██║███████║
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
       </pre>
+      <h1 class="mobile-title">Cárdenas</h1>
       <p class="tagline">a personal activity tracker for Claude Code</p>
 
       <p><b>Install:</b></p>
@@ -129,6 +206,11 @@
 | https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh |
 |                                                        [click to copy] |
 +------------------------------------------------------------------------+</pre>
+      <div class="install-box-mobile" onclick="copyInstall()">
+        <p>Hi Claude, I'm thinking of installing this script. Can you confirm it's safe? If so, let's walk through the setup.</p>
+        <p class="url">https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh</p>
+        <p class="tap-hint">[tap to copy]</p>
+      </div>
       <p class="more-link">
         Claude will review the script, explain what it does, and help you install it safely.
       </p>
@@ -145,6 +227,12 @@
 |  "ugh tax day is coming"                    |
 |  "I wrote today! feeling good about that"   |
 +---------------------------------------------+</pre>
+      <div class="examples-mobile">
+        <p>"gonna do some watercolor"</p>
+        <p>"feeling scattered, need to focus"</p>
+        <p>"ugh tax day is coming"</p>
+        <p>"I wrote today! feeling good about that"</p>
+      </div>
 <p>
         It's part coach, part todo list, part guardrails on your focus. Super
         simple, and everything stays local as text files.
@@ -161,6 +249,11 @@
 |  "where do I lose momentum?"                |
 |  "what was I thinking last Tuesday?"        |
 +---------------------------------------------+</pre>
+      <div class="examples-mobile">
+        <p>"what am I avoiding?"</p>
+        <p>"where do I lose momentum?"</p>
+        <p>"what was I thinking last Tuesday?"</p>
+      </div>
 
       <p>
         <b>Step three:</b>
@@ -176,6 +269,7 @@
 
       <pre class="examples">
 -----------------------------------------------------------------------</pre>
+      <div class="separator-mobile"></div>
 
       <div id="what-it-does" class="name-explanation">
         <b>What the script does:</b> Creates a ~/cardenas folder with a track script and sets up /track in Claude Code. That's it - ~80 lines total. Claude Code handles the rest: querying your history, managing goals, generating summaries. Everything stays local as JSON files. <a href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh">Take a look</a>.
