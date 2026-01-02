@@ -197,93 +197,88 @@
     <pre class="firework" id="firework"></pre>
 
     <script>
+      // Frames adapted from saponace/fireworks (MIT license)
       const frames = [
-        // Frame 1: tiny spark
+        // Frame 1: spark
         `
-    *
+            *
 `,
-        // Frame 2: small burst
+        // Frame 2: initial burst
         `
-    ·
-   *+*
-    ·
+            |
+           \\|/
+           -0-
+           /|\\
+            |
 `,
-        // Frame 3: growing
+        // Frame 3: expanding
         `
-      .
-    · | ·
-   --*+*--
-    · | ·
-      '
+            |
+           \\|/
+         -- 0 --
+           /|\\
+            |
 `,
-        // Frame 4: bigger
+        // Frame 4: full burst
         `
-        .
-      ' | '
-    ·   |   ·
-   ----*+*----
-    ·   |   ·
-      · | ·
-        '
+            |
+      °     |     °
+         \`\\   /\`
+        '   :    '
+     -- - = 0 = - --
+        \`   :  \`
+         \`/   \\ '
+      °     |     °
+            |
 `,
-        // Frame 5: explosion
+        // Frame 5: expanding more
         `
-          .
-        · | ·
-      '   |   '
-    ·     |     ·
-   ------*+*------
-    ·     |     ·
-      ·   |   ·
-        · | ·
-          '
+     \\            /
+            |
+        °       °
+           \\ /
+      '           '
+     - -    :    - -
+      ,           ,
+           / \\
+        °       °
+            |
+     /            \\
 `,
-        // Frame 6: full burst with sparkles
+        // Frame 6: dispersing
         `
-            ✦
-          · | ·
-        '   |   '
-      ·  ·  |  ·  ·
-    '       |       '
-   --------*+*--------
-    '       |       '
-      ·  ·  |  ·  ·
-        ·   |   ·
-          · | ·
-            ✦
+      \\          /
+
+          °   °
+        \`       \`
+     -             -
+        ,       ,
+          °   °
+
+      /          \\
 `,
-        // Frame 7: expanding outward
+        // Frame 7: fading
         `
-              ·
-            . | .
-          ·   |   ·
-        .  ·  |  ·  .
-      ·       |       ·
-    .    ·    |    ·    .
-   ----------===----------
-    .    ·    |    ·    .
-      ·       |       ·
-        ·  ·  |  ·  ·
-          ·   |   ·
-            · | ·
-              ·
+
+        °       °
+
+
+     '             '
+
+
+        ,       ,
+
 `,
-        // Frame 8: fading out
+        // Frame 8: almost gone
         `
-                ·
-              .   .
-            ·       ·
-          .    ·    .
-        ·           ·
-      .       ·       .
-    ·                   ·
-              ·
-    ·                   ·
-      ·       ·       ·
-        ·           ·
-          ·    ·    ·
-            ·     ·
-              · ·
+
+          .   .
+
+
+
+                    '
+
+          ,
 `
       ];
 
