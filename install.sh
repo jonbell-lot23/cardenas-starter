@@ -1,21 +1,41 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════════════════
-# Cárdenas Installer v0.2.0
+# Cárdenas Installer v0.2.1
 # A personal activity tracker for Claude Code
 # Cross-platform: macOS, Linux, Windows (WSL/Git Bash)
 # ═══════════════════════════════════════════════════════════════════════════
 
-VERSION="0.2.0"
+set -euo pipefail
+
+VERSION="0.2.1"
+
+# Cleanup on failure
+INSTALL_STARTED=false
+cleanup() {
+  if [[ "$INSTALL_STARTED" == true && $? -ne 0 ]]; then
+    echo ""
+    echo "Installation failed. Partial files may remain in $DIR"
+    echo "You can safely re-run this installer."
+  fi
+}
+trap cleanup EXIT
 
 echo ""
 echo "Cárdenas - activity tracker for Claude Code"
 echo ""
-read -p "Install directory [~/cardenas]: " DIR
+read -p "Install directory [~/cardenas]: " DIR || DIR=""
 DIR="${DIR:-$HOME/cardenas}"
 DIR="${DIR/#\~/$HOME}"
 
+# Validate directory path (no control characters or dangerous patterns)
+if [[ "$DIR" =~ [[:cntrl:]] ]] || [[ "$DIR" == *".."* ]]; then
+  echo "Error: Invalid directory path"
+  exit 1
+fi
+
 echo ""
 echo "Creating: $DIR"
+INSTALL_STARTED=true
 
 # Create directory structure
 mkdir -p "$DIR/activity/raw/daily"
@@ -30,21 +50,21 @@ FILE="$DIR/activity/raw/daily/$(date +%Y-%m-%d).json"
 MSG="$*"
 [[ -z "$MSG" ]] && { echo "Usage: track \"message\""; exit 1; }
 
-# Escape quotes and backslashes for JSON
-MSG_ESCAPED=$(printf '%s' "$MSG" | sed 's/\\/\\\\/g; s/"/\\"/g')
+# Escape special characters for valid JSON
+# Order matters: backslashes first, then other escapes
+MSG_ESCAPED=$(printf '%s' "$MSG" | sed 's/\\/\\\\/g; s/"/\\"/g; s/	/\\t/g' | tr '\n' ' ' | tr '\r' ' ')
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 ENTRY="{\"time\":\"$TIMESTAMP\",\"activity\":\"$MSG_ESCAPED\"}"
 
 if command -v jq &>/dev/null; then
   jq ". += [$ENTRY]" "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
 else
-  # Fallback without jq
+  # Fallback without jq - use atomic writes
   CONTENT=$(cat "$FILE")
   if [[ "$CONTENT" == "[]" ]]; then
-    echo "[$ENTRY]" > "$FILE"
+    echo "[$ENTRY]" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
   else
-    printf '%s' "${CONTENT%]}" > "$FILE"
-    printf ',%s]' "$ENTRY" >> "$FILE"
+    printf '%s,%s]' "${CONTENT%]}" "$ENTRY" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
   fi
 fi
 echo "✓ $MSG"

@@ -279,11 +279,10 @@
         <b>The name:</b> Named after García López de Cárdenas, the first
         European to see the Grand Canyon in 1540. He stood at the rim of
         something vast and couldn't fully comprehend what he was looking at.
-        That's the feeling of contintual discovery this tool is built around.
+        That's the feeling of continual discovery this tool is built around.
         
         Each day you add a little more, and over time you start
         to see patterns you couldn't see before.
-        </div>
       </div>
 
     </div>
@@ -409,20 +408,35 @@
 
 https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh`;
         navigator.clipboard.writeText(cmd).then(() => {
+          // Update desktop box
           const box = document.querySelector(".install-box");
-          const original = box.textContent;
-          box.textContent = box.textContent.replace(
-            "[click to copy]",
-            "[copied!]      "
-          );
+          if (box) {
+            const original = box.textContent;
+            box.textContent = box.textContent.replace(
+              "[click to copy]",
+              "[copied!]      "
+            );
+            setTimeout(() => {
+              box.textContent = original;
+            }, 2000);
+          }
+          // Update mobile box
+          const mobileHint = document.querySelector(".install-box-mobile .tap-hint");
+          if (mobileHint) {
+            const originalMobile = mobileHint.textContent;
+            mobileHint.textContent = "[copied!]";
+            setTimeout(() => {
+              mobileHint.textContent = originalMobile;
+            }, 2000);
+          }
           launchFirework();
-          setTimeout(() => {
-            box.textContent = original;
-          }, 2000);
+        }).catch(() => {
+          // Fallback: show alert if clipboard access denied
+          alert("Copied! (Or press Ctrl+C after selecting the text)");
         });
       }
     </script>
     <script data-goatcounter="https://jonbell.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+        async src="https://gc.zgo.at/count.js"></script>
   </body>
 </html>

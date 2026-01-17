@@ -232,7 +232,7 @@ Here's how you might add your first extension:
 **Create `scripts/read-activity`:**
 ```bash
 #!/bin/bash
-DIR="$HOME/cardenasQA"
+DIR="$HOME/cardenas"
 
 case "$1" in
   --today)
