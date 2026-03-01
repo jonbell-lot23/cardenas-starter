@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-VERSION="0.2.1"
+VERSION="0.3.0"
 
 # Cleanup on failure
 INSTALL_STARTED=false
@@ -44,30 +44,48 @@ mkdir -p "$HOME/.claude/commands"
 # Create the track script
 cat > "$DIR/track" << 'TRACKSCRIPT'
 #!/bin/bash
+set -euo pipefail
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FILE="$DIR/activity/raw/daily/$(date +%Y-%m-%d).json"
-[[ ! -f "$FILE" ]] && echo "[]" > "$FILE"
 MSG="$*"
 [[ -z "$MSG" ]] && { echo "Usage: track \"message\""; exit 1; }
 
-# Escape special characters for valid JSON
-# Order matters: backslashes first, then other escapes
-MSG_ESCAPED=$(printf '%s' "$MSG" | sed 's/\\/\\\\/g; s/"/\\"/g; s/	/\\t/g' | tr '\n' ' ' | tr '\r' ' ')
-TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-ENTRY="{\"time\":\"$TIMESTAMP\",\"activity\":\"$MSG_ESCAPED\"}"
+mkdir -p "$(dirname "$FILE")"
+TIMESTAMP=$(date -Iseconds 2>/dev/null || date +%Y-%m-%dT%H:%M:%S%z)
+LOCK_FILE="/tmp/cardenas-track.lock"
 
-if command -v jq &>/dev/null; then
-  jq ". += [$ENTRY]" "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
-else
-  # Fallback without jq - use atomic writes
-  CONTENT=$(cat "$FILE")
-  if [[ "$CONTENT" == "[]" ]]; then
-    echo "[$ENTRY]" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
-  else
-    printf '%s,%s]' "${CONTENT%]}" "$ENTRY" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
-  fi
-fi
-echo "✓ $MSG"
+# Use Python for safe JSON handling — message passed via stdin to avoid quote issues
+(
+    flock -w 5 200 2>/dev/null || true  # flock may not exist on all systems
+
+    echo "$MSG" | python3 -c "
+import json, os, sys, shutil
+
+file_path = '$FILE'
+timestamp = '$TIMESTAMP'
+activity = sys.stdin.read().strip()
+
+if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+    shutil.copy2(file_path, file_path + '.backup')
+    try:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+        if not isinstance(data, list):
+            data = []
+    except (json.JSONDecodeError, IOError, ValueError):
+        data = []
+else:
+    data = []
+
+data.append({'time': timestamp, 'activity': activity})
+
+with open(file_path, 'w') as f:
+    json.dump(data, f, separators=(',', ':'))
+"
+) 200>"$LOCK_FILE" 2>/dev/null
+
+echo "✓ tracked to $(basename "$FILE") : $MSG"
 TRACKSCRIPT
 chmod +x "$DIR/track"
 
