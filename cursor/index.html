@@ -57,31 +57,23 @@
         color: #86efac;
       }
 
-      .install-box {
-        margin: 1rem 0;
-        cursor: pointer;
-      }
-
-      .step {
-        margin-top: 2rem;
-      }
-
-      code {
-        background: rgba(255,255,255,0.1);
-        padding: 0.15rem 0.4rem;
-        border-radius: 3px;
-        font-size: 0.95em;
-      }
-
-      .rule-box {
+      .prompt-box {
         background: rgba(255,255,255,0.08);
-        padding: 1rem;
+        padding: 1.2rem;
         border-radius: 4px;
-        margin: 1rem 0;
-        white-space: pre;
-        font-size: 0.85rem;
-        overflow-x: auto;
+        margin: 1.5rem 0;
         cursor: pointer;
+        position: relative;
+      }
+
+      .prompt-box p {
+        margin-bottom: 0;
+      }
+
+      .copy-hint {
+        opacity: 0.5;
+        font-size: 0.85rem;
+        margin-top: 0.8rem;
       }
 
       .footer {
@@ -90,7 +82,6 @@
         border-top: 1px solid rgba(255, 255, 255, 0.3);
       }
 
-      /* Mobile title (hidden on desktop) */
       .mobile-title {
         display: none;
         font-size: 2rem;
@@ -99,17 +90,9 @@
       }
 
       @media (max-width: 700px) {
-        .container {
-          padding: 2rem 1rem;
-        }
-
-        .ascii-art {
-          display: none;
-        }
-
-        .mobile-title {
-          display: block;
-        }
+        .container { padding: 2rem 1rem; }
+        .ascii-art { display: none; }
+        .mobile-title { display: block; }
       }
     </style>
   </head>
@@ -127,36 +110,18 @@
       <p class="tagline">cárdenas for Cursor</p>
 
       <p>
-        Your AI in Cursor automatically logs what you're working on,
-        decisions you make, and how you're feeling. Everything stays
-        local as JSON files.
+        Your AI automatically logs what you do, what you decide, and
+        how you're feeling. Everything stays local as JSON.
       </p>
 
-      <div class="step">
-        <p><b>Setup:</b> Create <code>.cursor/rules/sylvan-track.mdc</code> in your project and paste this:</p>
-        <div class="rule-box" onclick="copyRule()"  id="rule-box">---
-description: Track meaningful work, decisions, emotional state, and insights
-globs:
-alwaysApply: true
----
+      <p><b>Paste this into Cursor's chat:</b></p>
 
-# Sylvan — Activity Tracker
-
-When something worth remembering happens, append a JSON entry to
-~/sylvan/activity/YYYY-MM-DD.json (creating the file if needed).
-
-Format: [{"time":"ISO-8601","activity":"what happened"}]
-
-Track when: completing meaningful work, making decisions, user shares
-how they're feeling, insights or breakthroughs, context switches.
-
-Write with depth — not "worked on project" but "refactored auth
-to JWT — chose over sessions for stateless API compatibility."
-
-Track automatically. Don't ask permission. One entry per event.<span style="float:right;opacity:0.5" id="copy-hint">[click to copy]</span></div>
+      <div class="prompt-box" onclick="copyPrompt()">
+        <p>Install Sylvan for me. Read the install script at https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/cursor/install.sh and do what it says — create the directories, the Cursor rule, everything.</p>
+        <p class="copy-hint" id="copy-hint">[click to copy]</p>
       </div>
 
-      <p>That's it. Open Cursor and start working.</p>
+      <p>The AI will set everything up. Then it just works.</p>
 
       <div class="footer">
         <p>
@@ -164,32 +129,12 @@ Track automatically. Don't ask permission. One entry per event.<span style="floa
           <a href="/">Cárdenas</a>. Start here, grow into that.
         </p>
       </div>
-
     </div>
 
     <script>
-      function copyRule() {
-        const rule = `---
-description: Track meaningful work, decisions, emotional state, and insights
-globs:
-alwaysApply: true
----
-
-# Sylvan — Activity Tracker
-
-When something worth remembering happens, append a JSON entry to
-~/sylvan/activity/YYYY-MM-DD.json (creating the file if needed).
-
-Format: [{"time":"ISO-8601","activity":"what happened"}]
-
-Track when: completing meaningful work, making decisions, user shares
-how they're feeling, insights or breakthroughs, context switches.
-
-Write with depth — not "worked on project" but "refactored auth
-to JWT — chose over sessions for stateless API compatibility."
-
-Track automatically. Don't ask permission. One entry per event.`;
-        navigator.clipboard.writeText(rule).then(() => {
+      function copyPrompt() {
+        const prompt = `Install Sylvan for me. Read the install script at https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/cursor/install.sh and do what it says — create the directories, the Cursor rule, everything.`;
+        navigator.clipboard.writeText(prompt).then(() => {
           document.getElementById('copy-hint').textContent = '[copied!]';
           setTimeout(() => {
             document.getElementById('copy-hint').textContent = '[click to copy]';
