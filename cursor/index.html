@@ -49,13 +49,12 @@
         margin-bottom: 1rem;
       }
 
-      .examples {
-        margin: 1.5rem 0;
-        white-space: pre;
-      }
-
       a {
         color: #fff;
+      }
+
+      b {
+        color: #86efac;
       }
 
       .install-box {
@@ -63,22 +62,32 @@
         cursor: pointer;
       }
 
-      b {
-        color: #86efac;
+      .step {
+        margin-top: 2rem;
       }
 
-      .more-link {
-        margin-bottom: 1rem;
+      code {
+        background: rgba(255,255,255,0.1);
+        padding: 0.15rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.95em;
+      }
+
+      .rule-box {
+        background: rgba(255,255,255,0.08);
+        padding: 1rem;
+        border-radius: 4px;
+        margin: 1rem 0;
+        white-space: pre;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        cursor: pointer;
       }
 
       .footer {
         margin-top: 3rem;
         padding-top: 1.5rem;
         border-top: 1px solid rgba(255, 255, 255, 0.3);
-      }
-
-      .name-explanation {
-        margin-top: 2rem;
       }
 
       /* Mobile title (hidden on desktop) */
@@ -89,69 +98,16 @@
         margin-bottom: 0.5rem;
       }
 
-      /* Mobile install box */
-      .install-box-mobile {
-        display: none;
-        background: rgba(255,255,255,0.1);
-        padding: 1rem;
-        border-radius: 4px;
-        margin: 1rem 0;
-        cursor: pointer;
-      }
-
-      .install-box-mobile .url {
-        word-break: break-all;
-        font-size: 0.85rem;
-        opacity: 0.9;
-      }
-
-      .install-box-mobile .tap-hint {
-        margin-top: 0.5rem;
-        opacity: 0.7;
-        font-size: 0.85rem;
-      }
-
-      /* Mobile examples */
-      .examples-mobile {
-        display: none;
-        background: rgba(255,255,255,0.1);
-        padding: 1rem;
-        border-radius: 4px;
-        margin: 1.5rem 0;
-      }
-
-      .examples-mobile p {
-        margin-bottom: 0.5rem;
-        opacity: 0.9;
-      }
-
-      .examples-mobile p:last-child {
-        margin-bottom: 0;
-      }
-
-      /* Mobile separator */
-      .separator-mobile {
-        display: none;
-        border-top: 1px solid rgba(255,255,255,0.3);
-        margin: 2rem 0;
-      }
-
-      /* Mobile styles */
       @media (max-width: 700px) {
         .container {
           padding: 2rem 1rem;
         }
 
-        .ascii-art,
-        .install-box,
-        .examples {
+        .ascii-art {
           display: none;
         }
 
-        .mobile-title,
-        .install-box-mobile,
-        .examples-mobile,
-        .separator-mobile {
+        .mobile-title {
           display: block;
         }
       }
@@ -170,90 +126,74 @@
       <h1 class="mobile-title">Sylvan</h1>
       <p class="tagline">cárdenas for Cursor</p>
 
-      <p><b>Install:</b></p>
-      <p>In your terminal:</p>
-      <pre class="install-box" onclick="copyInstall()">
-+------------------------------------------------------------------------+
-| bash <(curl -s https://raw.githubusercontent.com/jonbell-lot23/        |
-|   cardenas-starter/main/cursor/install.sh)                             |
-|                                                        [click to copy] |
-+------------------------------------------------------------------------+</pre>
-      <div class="install-box-mobile" onclick="copyInstall()">
-        <p class="url">bash &lt;(curl -s https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/cursor/install.sh)</p>
-        <p class="tap-hint">[tap to copy]</p>
-      </div>
-      <p class="more-link">
-        Creates a ~/sylvan folder with a track script and adds a Cursor rule so your AI auto-tracks your work.
-      </p>
-
-      <p style="margin-top: 2rem">
-        <b>What it does:</b> As you work in Cursor, the AI automatically
-        logs meaningful activities — decisions, breakthroughs, context
-        switches, how you're feeling. Everything stays local as JSON files.
-      </p>
-
-      <pre class="examples">
-+---------------------------------------------+
-|  "refactored auth to use JWT tokens"        |
-|  "feeling scattered, switching to tests"    |
-|  "key insight: the bug was in the reducer"  |
-|  "decided to use Postgres over SQLite"      |
-+---------------------------------------------+</pre>
-      <div class="examples-mobile">
-        <p>"refactored auth to use JWT tokens"</p>
-        <p>"feeling scattered, switching to tests"</p>
-        <p>"key insight: the bug was in the reducer"</p>
-        <p>"decided to use Postgres over SQLite"</p>
-      </div>
-
       <p>
-        Over time you build a searchable log of what you did, why, and how
-        you were feeling. Great for standups, retros, or just remembering
-        what happened last Tuesday.
+        Your AI in Cursor automatically logs what you're working on,
+        decisions you make, and how you're feeling. Everything stays
+        local as JSON files.
       </p>
 
-      <pre class="examples">
------------------------------------------------------------------------</pre>
-      <div class="separator-mobile"></div>
+      <div class="step">
+        <p><b>Setup:</b> Create <code>.cursor/rules/sylvan-track.mdc</code> in your project and paste this:</p>
+        <div class="rule-box" onclick="copyRule()"  id="rule-box">---
+description: Track meaningful work, decisions, emotional state, and insights
+globs:
+alwaysApply: true
+---
 
-      <div class="name-explanation">
-        <b>What gets created:</b> A ~/sylvan folder with a <code>track</code> script (~50 lines, Python + bash) and a <code>.cursor/rules/sylvan-track.mdc</code> rule that tells Cursor's AI when and how to track. That's it. <a href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/cursor/install.sh">Take a look</a>.
+# Sylvan — Activity Tracker
+
+When something worth remembering happens, append a JSON entry to
+~/sylvan/activity/YYYY-MM-DD.json (creating the file if needed).
+
+Format: [{"time":"ISO-8601","activity":"what happened"}]
+
+Track when: completing meaningful work, making decisions, user shares
+how they're feeling, insights or breakthroughs, context switches.
+
+Write with depth — not "worked on project" but "refactored auth
+to JWT — chose over sessions for stateless API compatibility."
+
+Track automatically. Don't ask permission. One entry per event.<span style="float:right;opacity:0.5" id="copy-hint">[click to copy]</span></div>
       </div>
 
-      <div class="name-explanation">
-        <b>Want more?</b> Sylvan is the Cursor-friendly starter for
-        <a href="/">Cárdenas</a>, a full activity tracking system with
-        goals, daily scoring, health tracking, and more. Start here,
-        grow into that.
+      <p>That's it. Open Cursor and start working.</p>
+
+      <div class="footer">
+        <p>
+          Sylvan is the Cursor-friendly starter for
+          <a href="/">Cárdenas</a>. Start here, grow into that.
+        </p>
       </div>
 
     </div>
 
     <script>
-      function copyInstall() {
-        const cmd = `bash <(curl -s https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/cursor/install.sh)`;
-        navigator.clipboard.writeText(cmd).then(() => {
-          const box = document.querySelector(".install-box");
-          if (box) {
-            const original = box.textContent;
-            box.textContent = box.textContent.replace(
-              "[click to copy]",
-              "[copied!]      "
-            );
-            setTimeout(() => {
-              box.textContent = original;
-            }, 2000);
-          }
-          const mobileHint = document.querySelector(".install-box-mobile .tap-hint");
-          if (mobileHint) {
-            const originalMobile = mobileHint.textContent;
-            mobileHint.textContent = "[copied!]";
-            setTimeout(() => {
-              mobileHint.textContent = originalMobile;
-            }, 2000);
-          }
-        }).catch(() => {
-          alert("Copied! (Or press Ctrl+C after selecting the text)");
+      function copyRule() {
+        const rule = `---
+description: Track meaningful work, decisions, emotional state, and insights
+globs:
+alwaysApply: true
+---
+
+# Sylvan — Activity Tracker
+
+When something worth remembering happens, append a JSON entry to
+~/sylvan/activity/YYYY-MM-DD.json (creating the file if needed).
+
+Format: [{"time":"ISO-8601","activity":"what happened"}]
+
+Track when: completing meaningful work, making decisions, user shares
+how they're feeling, insights or breakthroughs, context switches.
+
+Write with depth — not "worked on project" but "refactored auth
+to JWT — chose over sessions for stateless API compatibility."
+
+Track automatically. Don't ask permission. One entry per event.`;
+        navigator.clipboard.writeText(rule).then(() => {
+          document.getElementById('copy-hint').textContent = '[copied!]';
+          setTimeout(() => {
+            document.getElementById('copy-hint').textContent = '[click to copy]';
+          }, 2000);
         });
       }
     </script>
