@@ -1,13 +1,13 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════════════════
-# Cárdenas Installer v0.2.1
+# Cárdenas Installer v0.4.0
 # A personal activity tracker for Claude Code
 # Cross-platform: macOS, Linux, Windows (WSL/Git Bash)
 # ═══════════════════════════════════════════════════════════════════════════
 
 set -euo pipefail
 
-VERSION="0.3.0"
+VERSION="0.4.0"
 
 # Cleanup on failure
 INSTALL_STARTED=false
@@ -23,9 +23,18 @@ trap cleanup EXIT
 echo ""
 echo "Cárdenas - activity tracker for Claude Code"
 echo ""
-read -p "Install directory [~/cardenas]: " DIR || DIR=""
-DIR="${DIR:-$HOME/cardenas}"
-DIR="${DIR/#\~/$HOME}"
+
+# -------------------------------------------------------------------
+# 1. Choose agent name
+# -------------------------------------------------------------------
+read -p "Agent name [Cardenas]: " AGENT_NAME || AGENT_NAME=""
+AGENT_NAME="${AGENT_NAME:-Cardenas}"
+AGENT_NAME_LOWER=$(echo "$AGENT_NAME" | tr '[:upper:]' '[:lower:]')
+
+# -------------------------------------------------------------------
+# 2. Determine install directory
+# -------------------------------------------------------------------
+DIR="$HOME/.${AGENT_NAME_LOWER}"
 
 # Validate directory path (no control characters or dangerous patterns)
 if [[ "$DIR" =~ [[:cntrl:]] ]] || [[ "$DIR" == *".."* ]]; then
@@ -33,21 +42,134 @@ if [[ "$DIR" =~ [[:cntrl:]] ]] || [[ "$DIR" == *".."* ]]; then
   exit 1
 fi
 
+# -------------------------------------------------------------------
+# 3. Check for existing install (e.g. from Cursor installer)
+# -------------------------------------------------------------------
+if [[ -f "$DIR/bin/track" ]]; then
+  echo ""
+  echo "  ${AGENT_NAME} is already installed at $DIR"
+  echo "  (bin/track and data directory exist)"
+  echo ""
+  echo "  Adding Claude Code integration..."
+  echo ""
+
+  # Just add the Claude Code skill and permissions
+  mkdir -p "$HOME/.claude/commands"
+
+  cat > "$HOME/.claude/commands/track.md" << SKILL
+---
+name: track
+description: Use when completing meaningful work, when user shares emotional state or mood, when making decisions (even in "routine" tasks), or when insights emerge
+---
+
+# Track Activity to ${AGENT_NAME}
+
+Log activities, decisions, and context to build a rich record of work and life.
+
+## When to Track
+
+**Always track:**
+- Emotional state when shared ("feeling scattered", "energized", "frustrated")
+- The *reason* behind a task, not just the task itself
+- Decisions made (even in "routine" work like refactoring)
+- Breakthroughs, insights, realizations
+- Completed meaningful work
+
+**The "why" matters more than the "what":**
+- BAD: "Refactored function"
+- GOOD: "Refactored filterByType - chose functional approach over imperative for clarity"
+- BAD: "Built TODO component"
+- GOOD: "Built TODO component - user feeling scattered, wanted something concrete to feel grounded"
+
+## When NOT to Track
+
+- Trivial file reads/writes
+- Commands run during debugging
+- Information already in git history
+
+## Red Flags - You're Rationalizing
+
+| Thought | Reality |
+|---------|---------|
+| "This is routine work" | Routine work contains decisions worth noting |
+| "They didn't ask me to log it" | Emotional context is always worth capturing |
+| "It's just a simple task" | The *why* behind simple tasks matters |
+| "I'll track when something big happens" | The texture of the day IS the record |
+
+## Command
+
+\`\`\`bash
+$DIR/bin/track "\$ARGUMENTS"
+\`\`\`
+
+One activity per line. Include context, not just outcomes.
+SKILL
+
+  # Add permissions
+  SETTINGS="$HOME/.claude/settings.json"
+  PERM1="Bash($DIR/bin/track:*)"
+  PERM2="Read($DIR/**)"
+
+  add_permission() {
+    local perm="$1"
+    local file="$2"
+    if grep -q "$perm" "$file" 2>/dev/null; then
+      return 0
+    fi
+    if command -v jq &>/dev/null; then
+      jq ".permissions.allow += [\"$perm\"]" "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+    else
+      if grep -q '"allow":\[\]' "$file"; then
+        sed "s|\"allow\":\[\]|\"allow\":[\"$perm\"]|" "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+      elif grep -q '"allow":\[' "$file"; then
+        sed "s|\"allow\":\[|\"allow\":[\"$perm\",|" "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+      fi
+    fi
+  }
+
+  if [[ ! -f "$SETTINGS" ]]; then
+    echo '{"permissions":{"allow":[],"deny":[]}}' > "$SETTINGS"
+  fi
+
+  add_permission "$PERM1" "$SETTINGS"
+  add_permission "$PERM2" "$SETTINGS"
+
+  echo "  Claude Code integration added."
+  echo "  Restart Claude Code, then try: /track \"Just connected Claude Code to ${AGENT_NAME}\""
+  echo ""
+  exit 0
+fi
+
+# -------------------------------------------------------------------
+# 4. Fresh install
+# -------------------------------------------------------------------
 echo ""
 echo "Creating: $DIR"
 INSTALL_STARTED=true
 
 # Create directory structure
-mkdir -p "$DIR/activity/raw/daily"
+mkdir -p "$DIR/bin"
+mkdir -p "$DIR/data/activity/raw/daily"
+mkdir -p "$DIR/config"
 mkdir -p "$HOME/.claude/commands"
 
+# Save agent config
+python3 -c "
+import json
+config = {'name': '$AGENT_NAME', 'greeting': '$AGENT_NAME is ready.'}
+with open('$DIR/config/agent.json', 'w') as f:
+    json.dump(config, f, indent=2)
+    f.write('\n')
+"
+
 # Create the track script
-cat > "$DIR/track" << 'TRACKSCRIPT'
+cat > "$DIR/bin/track" << 'TRACKSCRIPT'
 #!/bin/bash
 set -euo pipefail
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-FILE="$DIR/activity/raw/daily/$(date +%Y-%m-%d).json"
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALL_DIR="$(dirname "$BIN_DIR")"
+FILE="$INSTALL_DIR/data/activity/raw/daily/$(date +%Y-%m-%d).json"
 MSG="$*"
 [[ -z "$MSG" ]] && { echo "Usage: track \"message\""; exit 1; }
 
@@ -85,9 +207,9 @@ with open(file_path, 'w') as f:
 "
 ) 200>"$LOCK_FILE" 2>/dev/null
 
-echo "✓ tracked to $(basename "$FILE") : $MSG"
+echo "tracked to $(basename "$FILE") : $MSG"
 TRACKSCRIPT
-chmod +x "$DIR/track"
+chmod +x "$DIR/bin/track"
 
 # Create /track skill for Claude Code
 cat > "$HOME/.claude/commands/track.md" << SKILL
@@ -96,7 +218,7 @@ name: track
 description: Use when completing meaningful work, when user shares emotional state or mood, when making decisions (even in "routine" tasks), or when insights emerge
 ---
 
-# Track Activity to Cárdenas
+# Track Activity to ${AGENT_NAME}
 
 Log activities, decisions, and context to build a rich record of work and life.
 
@@ -133,7 +255,7 @@ Log activities, decisions, and context to build a rich record of work and life.
 ## Command
 
 \`\`\`bash
-$DIR/track "\$ARGUMENTS"
+$DIR/bin/track "\$ARGUMENTS"
 \`\`\`
 
 One activity per line. Include context, not just outcomes.
@@ -141,7 +263,7 @@ SKILL
 
 # Add permissions to Claude settings (with jq-free fallback)
 SETTINGS="$HOME/.claude/settings.json"
-PERM1="Bash($DIR/track:*)"
+PERM1="Bash($DIR/bin/track:*)"
 PERM2="Read($DIR/**)"
 
 add_permission() {
@@ -177,20 +299,21 @@ add_permission "$PERM1" "$SETTINGS"
 add_permission "$PERM2" "$SETTINGS"
 
 # Save version
-echo "$VERSION" > "$HOME/.cardenas-version"
+echo "$VERSION" > "$DIR/config/version"
 
 echo ""
 echo "Done! Structure created:"
 echo ""
 echo "  $DIR/"
-echo "  ├── track"
-echo "  └── activity/raw/daily/"
+echo "  ├── bin/track"
+echo "  ├── data/activity/raw/daily/"
+echo "  └── config/agent.json"
 echo ""
 echo "Permissions added to ~/.claude/settings.json"
 echo ""
 echo "Next steps:"
 echo "  1. Restart Claude Code"
-echo "  2. Try: /track \"Just installed Cárdenas\""
+echo "  2. Try: /track \"Just installed ${AGENT_NAME}\""
 echo ""
 echo "Claude Code can query your activity files directly."
 echo "Ask things like \"what did I do today?\" or \"show me last week\""
