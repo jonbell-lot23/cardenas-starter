@@ -28,8 +28,8 @@
       }
 
       .container {
-        max-width: 72ch;
-        margin: 0;
+        max-width: 900px;
+        margin: 0 auto;
         padding: 3rem 2rem;
       }
 
@@ -49,38 +49,111 @@
         margin-bottom: 1rem;
       }
 
-      .examples {
-        margin: 1.5rem 0;
-        white-space: pre;
-      }
-
       a {
         color: #fff;
-      }
-
-      .install-box {
-        margin: 1rem 0;
-        cursor: pointer;
       }
 
       b {
         color: #7dd3fc;
       }
 
-      .more-link {
-        margin-bottom: 1rem;
+      .mobile-title {
+        display: none;
+        font-size: 2rem;
+        color: #7dd3fc;
+        margin-bottom: 0.5rem;
       }
 
-      .footer {
-        margin-top: 3rem;
-        padding-top: 1.5rem;
+      /* Install cards */
+      .install-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin: 2rem 0;
+      }
+
+      .install-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+
+      .install-card:hover {
+        background: rgba(255, 255, 255, 0.14);
+      }
+
+      .install-card h2 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        color: #7dd3fc;
+      }
+
+      .install-card .instructions {
+        font-size: 0.85rem;
+        opacity: 0.8;
+        margin-bottom: 0.75rem;
+      }
+
+      .install-card .prompt-text {
+        font-size: 0.8rem;
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+        opacity: 0.9;
+      }
+
+      .install-card .copy-hint {
+        opacity: 0.5;
+        font-size: 0.8rem;
+      }
+
+      .note {
+        text-align: center;
+        opacity: 0.6;
+        font-size: 0.85rem;
+        margin: 1rem 0 2rem;
+      }
+
+      /* Content sections */
+      .content-section {
+        max-width: 72ch;
+      }
+
+      .examples {
+        margin: 1.5rem 0;
+        white-space: pre;
+      }
+
+      .examples-mobile {
+        display: none;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 4px;
+        margin: 1.5rem 0;
+      }
+
+      .examples-mobile p {
+        margin-bottom: 0.5rem;
+        opacity: 0.9;
+      }
+
+      .examples-mobile p:last-child {
+        margin-bottom: 0;
+      }
+
+      .separator-mobile {
+        display: none;
         border-top: 1px solid rgba(255, 255, 255, 0.3);
+        margin: 2rem 0;
       }
 
       .name-explanation {
         margin-top: 2rem;
       }
 
+      /* Firework */
       .firework {
         position: fixed;
         font-family: "Courier New", Courier, monospace;
@@ -103,61 +176,6 @@
         transition: opacity 0.4s ease-out;
       }
 
-      /* Mobile title (hidden on desktop) */
-      .mobile-title {
-        display: none;
-        font-size: 2rem;
-        color: #7dd3fc;
-        margin-bottom: 0.5rem;
-      }
-
-      /* Mobile install box */
-      .install-box-mobile {
-        display: none;
-        background: rgba(255,255,255,0.1);
-        padding: 1rem;
-        border-radius: 4px;
-        margin: 1rem 0;
-        cursor: pointer;
-      }
-
-      .install-box-mobile .url {
-        word-break: break-all;
-        font-size: 0.85rem;
-        opacity: 0.9;
-      }
-
-      .install-box-mobile .tap-hint {
-        margin-top: 0.5rem;
-        opacity: 0.7;
-        font-size: 0.85rem;
-      }
-
-      /* Mobile examples */
-      .examples-mobile {
-        display: none;
-        background: rgba(255,255,255,0.1);
-        padding: 1rem;
-        border-radius: 4px;
-        margin: 1.5rem 0;
-      }
-
-      .examples-mobile p {
-        margin-bottom: 0.5rem;
-        opacity: 0.9;
-      }
-
-      .examples-mobile p:last-child {
-        margin-bottom: 0;
-      }
-
-      /* Mobile separator */
-      .separator-mobile {
-        display: none;
-        border-top: 1px solid rgba(255,255,255,0.3);
-        margin: 2rem 0;
-      }
-
       /* Mobile styles */
       @media (max-width: 700px) {
         .container {
@@ -165,17 +183,19 @@
         }
 
         .ascii-art,
-        .install-box,
         .examples,
         .firework {
           display: none;
         }
 
         .mobile-title,
-        .install-box-mobile,
         .examples-mobile,
         .separator-mobile {
           display: block;
+        }
+
+        .install-cards {
+          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -194,109 +214,122 @@
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
       </pre>
       <h1 class="mobile-title">Cárdenas</h1>
-      <p class="tagline">a personal activity tracker for Claude Code</p>
+      <p class="tagline">a personal activity tracker that lives inside your AI coding tool</p>
 
-      <p><b>Install:</b></p>
-      <p>Open Claude Code and say:</p>
-      <pre class="install-box" onclick="copyInstall()">
-+------------------------------------------------------------------------+
-| Hi Claude, I'm thinking of installing this script. Can you             |
-| confirm it's safe? If so, let's walk through the setup.                |
-|                                                                        |
-| https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh |
-|                                                        [click to copy] |
-+------------------------------------------------------------------------+</pre>
-      <div class="install-box-mobile" onclick="copyInstall()">
-        <p>Hi Claude, I'm thinking of installing this script. Can you confirm it's safe? If so, let's walk through the setup.</p>
-        <p class="url">https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh</p>
-        <p class="tap-hint">[tap to copy]</p>
+      <p>
+        Your AI automatically logs what you do, what you decide, and how you're
+        feeling. Everything stays local as JSON files.
+      </p>
+
+      <div class="install-cards">
+        <!-- Claude Code card -->
+        <div class="install-card" onclick="copyClaudeCode()">
+          <h2>Cárdenas for Claude Code</h2>
+          <p class="instructions">Open Claude Code and paste:</p>
+          <p class="prompt-text">
+            Hi Claude, I'm thinking of installing this script. Can you confirm
+            it's safe? If so, let's walk through the setup.<br><br>
+            https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh
+          </p>
+          <p class="copy-hint" id="hint-claude">[click to copy]</p>
+        </div>
+
+        <!-- Cursor card -->
+        <div class="install-card" onclick="copyCursor()">
+          <h2>Cárdenas for Cursor</h2>
+          <p class="instructions">Open Cursor's chat and paste:</p>
+          <p class="prompt-text">
+            Install Sylvan for me. Read the install script at
+            https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/cursor/install.sh
+            and do what it says — create the directories, the Cursor rule, everything.
+          </p>
+          <p class="copy-hint" id="hint-cursor">[click to copy]</p>
+        </div>
       </div>
-      <p class="more-link">
-        Claude will review the script, explain what it does, and help you install it safely.
-      </p>
 
-      <p style="margin-top: 2rem">
-        <b>Step one:</b> tell Claude what you're working on, how you're feeling,
-        or what you need to remember:
-      </p>
+      <p class="note">Want to name your agent something else? You can change it during setup.</p>
 
-      <pre class="examples">
+      <div class="content-section">
+        <p>
+          <b>Step one:</b> tell your AI what you're working on, how you're feeling,
+          or what you need to remember:
+        </p>
+
+        <pre class="examples">
 +---------------------------------------------+
 |  "gonna do some watercolor"                 |
 |  "feeling scattered, need to focus"         |
 |  "ugh tax day is coming"                    |
 |  "I wrote today! feeling good about that"   |
 +---------------------------------------------+</pre>
-      <div class="examples-mobile">
-        <p>"gonna do some watercolor"</p>
-        <p>"feeling scattered, need to focus"</p>
-        <p>"ugh tax day is coming"</p>
-        <p>"I wrote today! feeling good about that"</p>
-      </div>
-<p>
-        It's part coach, part todo list, part guardrails on your focus. Super
-        simple, and everything stays local as text files.
-      </p>
+        <div class="examples-mobile">
+          <p>"gonna do some watercolor"</p>
+          <p>"feeling scattered, need to focus"</p>
+          <p>"ugh tax day is coming"</p>
+          <p>"I wrote today! feeling good about that"</p>
+        </div>
 
-      <p>
-        <b>Step two:</b> The system gets more valuable over time, so you can ask
-        bigger questions:
-      </p>
+        <p>
+          It's part coach, part todo list, part guardrails on your focus. Super
+          simple, and everything stays local as text files.
+        </p>
 
-      <pre class="examples">
+        <p>
+          <b>Step two:</b> The system gets more valuable over time, so you can ask
+          bigger questions:
+        </p>
+
+        <pre class="examples">
 +---------------------------------------------+
 |  "what am I avoiding?"                      |
 |  "where do I lose momentum?"                |
 |  "what was I thinking last Tuesday?"        |
 +---------------------------------------------+</pre>
-      <div class="examples-mobile">
-        <p>"what am I avoiding?"</p>
-        <p>"where do I lose momentum?"</p>
-        <p>"what was I thinking last Tuesday?"</p>
-      </div>
+        <div class="examples-mobile">
+          <p>"what am I avoiding?"</p>
+          <p>"where do I lose momentum?"</p>
+          <p>"what was I thinking last Tuesday?"</p>
+        </div>
 
-      <p>
-        <b>Step three:</b>
-        As you get more data, it's easy to wire it up to other things. In my
-        setup, I have it connected to my OmniFocus, Google Calendar, Granola,
-        and my writing projects.
-      </p>
-      <p>
-        But what really lights things up is getting started with simple daily
-        reflections. Just a few sentences each day can help you see patterns
-        over time.
-      </p>
+        <p>
+          <b>Step three:</b>
+          As you get more data, it's easy to wire it up to other things. In my
+          setup, I have it connected to my OmniFocus, Google Calendar, Granola,
+          and my writing projects.
+        </p>
+        <p>
+          But what really lights things up is getting started with simple daily
+          reflections. Just a few sentences each day can help you see patterns
+          over time.
+        </p>
 
-      <pre class="examples">
+        <pre class="examples">
 -----------------------------------------------------------------------</pre>
-      <div class="separator-mobile"></div>
+        <div class="separator-mobile"></div>
 
-      <div id="what-it-does" class="name-explanation">
-        <b>What the script does:</b> Creates a ~/cardenas folder with a track script and sets up /track in Claude Code. That's it - ~80 lines total. Claude Code handles the rest: querying your history, managing goals, generating summaries. Everything stays local as JSON files. <a href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh">Take a look</a>.
+        <div id="what-it-does" class="name-explanation">
+          <b>What the script does:</b> Creates a ~/cardenas folder with a track script and sets up /track in your AI tool. That's it - ~80 lines total. Your AI handles the rest: querying your history, managing goals, generating summaries. Everything stays local as JSON files. <a href="https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh">Take a look</a>.
+        </div>
+
+        <div class="name-explanation">
+          <b>The name:</b> Named after García López de Cárdenas, the first
+          European to see the Grand Canyon in 1540. He stood at the rim of
+          something vast and couldn't fully comprehend what he was looking at.
+          That's the feeling of continual discovery this tool is built around.
+
+          Each day you add a little more, and over time you start
+          to see patterns you couldn't see before.
+        </div>
       </div>
-
-      <div class="name-explanation">
-        <b>The name:</b> Named after García López de Cárdenas, the first
-        European to see the Grand Canyon in 1540. He stood at the rim of
-        something vast and couldn't fully comprehend what he was looking at.
-        That's the feeling of continual discovery this tool is built around.
-        
-        Each day you add a little more, and over time you start
-        to see patterns you couldn't see before.
-      </div>
-
     </div>
 
     <pre class="firework" id="firework"></pre>
 
     <script>
-      // Frames adapted from saponace/fireworks (MIT license)
       const frames = [
-        // Frame 1: spark
         `
             *
 `,
-        // Frame 2: initial burst
         `
             |
            \\|/
@@ -304,7 +337,6 @@
            /|\\
             |
 `,
-        // Frame 3: expanding
         `
             |
            \\|/
@@ -312,7 +344,6 @@
            /|\\
             |
 `,
-        // Frame 4: full burst
         `
             |
       °     |     °
@@ -324,7 +355,6 @@
       °     |     °
             |
 `,
-        // Frame 5: expanding more
         `
      \\            /
             |
@@ -338,7 +368,6 @@
             |
      /            \\
 `,
-        // Frame 6: dispersing
         `
       \\          /
 
@@ -350,7 +379,6 @@
 
       /          \\
 `,
-        // Frame 7: fading
         `
 
         °       °
@@ -362,7 +390,6 @@
         ,       ,
 
 `,
-        // Frame 8: almost gone
         `
 
           .   .
@@ -375,14 +402,12 @@
 `
       ];
 
-      function launchFirework() {
+      function launchFirework(card) {
         const fw = document.getElementById('firework');
-        const container = document.querySelector('.container');
-        const rect = container.getBoundingClientRect();
+        const rect = card.getBoundingClientRect();
 
-        // Position in the empty right area
-        fw.style.top = '120px';
-        fw.style.left = (rect.right + 80) + 'px';
+        fw.style.top = (rect.top - 60) + 'px';
+        fw.style.left = (rect.left + rect.width / 2 - 60) + 'px';
 
         let frame = 0;
         fw.classList.remove('fade');
@@ -403,36 +428,31 @@
         }, 100);
       }
 
-      function copyInstall() {
+      function copyClaudeCode() {
         const cmd = `Hi Claude, I'm thinking of installing this script. Can you confirm it's safe? If so, let's walk through the setup.
 
 https://github.com/jonbell-lot23/cardenas-starter/blob/main/install.sh`;
+        const hint = document.getElementById('hint-claude');
+        const card = hint.closest('.install-card');
         navigator.clipboard.writeText(cmd).then(() => {
-          // Update desktop box
-          const box = document.querySelector(".install-box");
-          if (box) {
-            const original = box.textContent;
-            box.textContent = box.textContent.replace(
-              "[click to copy]",
-              "[copied!]      "
-            );
-            setTimeout(() => {
-              box.textContent = original;
-            }, 2000);
-          }
-          // Update mobile box
-          const mobileHint = document.querySelector(".install-box-mobile .tap-hint");
-          if (mobileHint) {
-            const originalMobile = mobileHint.textContent;
-            mobileHint.textContent = "[copied!]";
-            setTimeout(() => {
-              mobileHint.textContent = originalMobile;
-            }, 2000);
-          }
-          launchFirework();
+          hint.textContent = '[copied!]';
+          setTimeout(() => { hint.textContent = '[click to copy]'; }, 2000);
+          launchFirework(card);
         }).catch(() => {
-          // Fallback: show alert if clipboard access denied
-          alert("Copied! (Or press Ctrl+C after selecting the text)");
+          alert("Copy failed — select the text manually.");
+        });
+      }
+
+      function copyCursor() {
+        const cmd = `Install Sylvan for me. Read the install script at https://raw.githubusercontent.com/jonbell-lot23/cardenas-starter/main/cursor/install.sh and do what it says — create the directories, the Cursor rule, everything.`;
+        const hint = document.getElementById('hint-cursor');
+        const card = hint.closest('.install-card');
+        navigator.clipboard.writeText(cmd).then(() => {
+          hint.textContent = '[copied!]';
+          setTimeout(() => { hint.textContent = '[click to copy]'; }, 2000);
+          launchFirework(card);
+        }).catch(() => {
+          alert("Copy failed — select the text manually.");
         });
       }
     </script>
